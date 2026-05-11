@@ -264,9 +264,15 @@
         let logoClickCount = 0;
 
         // Firebase Globals
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let firebaseConfig = {};
-        try { firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {}; } catch (e) {}
+        const appId = "digitallab-database";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqKQSM2r5OHnP2KsreGCie4OPt3Zxn60U",
+            authDomain: "digitallab-11622.firebaseapp.com",
+            projectId: "digitallab-11622",
+            storageBucket: "digitallab-11622.firebasestorage.app",
+            messagingSenderId: "99613620727",
+            appId: "1:99613620727:web:6e6bf58d5ec39986f296f2"
+        };
         let firestoreDb;
         let isFirebaseReady = false;
 

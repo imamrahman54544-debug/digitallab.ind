@@ -24,17 +24,16 @@
     <style>
         body {
             margin: 0; min-height: 100vh;
-            background: linear-gradient(-45deg, #0b0914, #1a1635, #2b1236, #111d38);
-            background-size: 400% 400%; animation: gradientBG 20s ease infinite;
+            /* Mengubah background animasi berat menjadi background gradien statis yang ringan dan elegan */
+            background: radial-gradient(circle at top right, #2b1236, #0b0914, #111d38);
+            background-attachment: fixed;
             color: #ffffff; overflow-x: hidden;
-            font-family: 'Inter', sans-serif; transition: font-family 0.5s ease;
-            will-change: background-position;
+            font-family: 'Inter', sans-serif;
         }
 
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); transform: translateZ(0); will-change: transform, backdrop-filter; }
-        .glass-hover:hover { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); transform: translateY(-4px) scale(1.02) translateZ(0); box-shadow: 0 15px 40px 0 rgba(226, 43, 226, 0.15); }
+        /* Mengoptimalkan efek Glassmorphism agar tidak membebani GPU */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+        .glass-hover:hover { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); transform: translateY(-4px); box-shadow: 0 15px 40px 0 rgba(226, 43, 226, 0.15); }
         .glass-active { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
         .transition-all { transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
 
@@ -232,7 +231,7 @@
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         function escapeHtml(text) {
@@ -256,14 +255,25 @@
             return videoId ? 'https://www.youtube.com/embed/' + videoId : null;
         }
 
-        let db = { config: [], courses: [], modules: [] };
+        // Data Cadangan Lokal (Akan dipakai kalau Firebase error)
+        let db = { 
+            config: [
+                { Key: "heroTitle", Value: "Kuasai AI & Iklan.<br>Skalakan Bisnis Anda." },
+                { Key: "heroDesc", Value: "Pusat sumber daya digital eksklusif. Pelajari strategi periklanan modern." },
+                { Key: "communityLink", Value: "https://t.me/komunitas" }
+            ], 
+            courses: [
+                { ID: "CRS-DUMMY", Title: "Database Belum Konek", Description: "Jika Anda melihat pesan ini, berarti Firebase belum aktif.", Icon: "bi-exclamation-triangle" }
+            ], 
+            modules: [] 
+        };
 
         let currentCourseId = null;
         let currentAdminCourseId = null;
         let currentUserRole = 'student'; 
         let logoClickCount = 0;
 
-        // Firebase Globals
+        // Firebase Globals (Milik Anda)
         const appId = "digitallab-database";
         const firebaseConfig = {
             apiKey: "AIzaSyAqKQSM2r5OHnP2KsreGCie4OPt3Zxn60U",
@@ -273,6 +283,7 @@
             messagingSenderId: "99613620727",
             appId: "1:99613620727:web:6e6bf58d5ec39986f296f2"
         };
+        
         let firestoreDb;
         let isFirebaseReady = false;
 
@@ -285,27 +296,45 @@
                 const auth = getAuth(app);
                 firestoreDb = getFirestore(app);
 
-                // Authenticate to access Database
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (authErr) {
-                    console.warn("Token internal Canvas tidak cocok dengan Firebase Anda. Beralih ke Login Anonim...", authErr);
-                    await signInAnonymously(auth); // Paksa login anonim ke Firebase Anda
-                }
+                // Paksa menggunakan Login Anonim (Abaikan token Canvas yang bikin bentrok)
+                await signInAnonymously(auth);
 
                 // Listen for Auth and Data changes
                 onAuthStateChanged(auth, (user) => {
                     if (user && !isFirebaseReady) {
                         isFirebaseReady = true;
+                        db.courses = []; // Kosongkan dummy data
                         loadDataFromFirebase();
                     }
                 });
+
             } catch (error) {
-                console.warn("Firebase Init Error (Fallback ke Mode Statis):", error);
+                console.error("Firebase Error Full:", error);
+                
+                // Pengecekan Error Detail
+                let titleMsg = 'Koneksi Database Gagal';
+                let hintMsg = 'Terjadi kesalahan sistem.';
+
+                // Jika errornya "configuration-not-found", itu artinya Fitur Anonim belum ter-save
+                if (error.code === 'auth/configuration-not-found' || error.message.includes('configuration-not-found')) {
+                    hintMsg = `<b>Fitur Login Anonim Belum Aktif di Firebase Anda!</b><br><br>
+                               <div class="text-left mt-3 text-sm bg-black/30 p-4 rounded-xl border border-white/10">
+                               <b>CARA MEMPERBAIKI:</b><br>
+                               1. Buka Firebase Console.<br>
+                               2. Masuk ke menu <b>Authentication</b>.<br>
+                               3. Klik tab <b>Sign-in method</b>.<br>
+                               4. Cari <b>Anonymous</b>, pastikan saklarnya <b>Enable</b>.<br>
+                               5. <b>PENTING:</b> Pastikan Anda mengklik tombol <b>Save</b> (Simpan) di kanan bawah!</div>`;
+                }
+
+                Swal.fire({
+                    title: titleMsg,
+                    html: `<span class="text-white/80">${hintMsg}</span><br><br><code class="text-red-400 text-[10px] break-words bg-black/50 p-2 rounded block mt-2">${error.message}</code>`,
+                    icon: 'warning',
+                    background: '#1a1635', color: '#fff'
+                });
+
+                // Fallback ke mode lokal agar web tidak nge-blank
                 endLoading();
                 setTimeout(() => { renderUI(); endLoading(); }, 500); 
             }
@@ -315,7 +344,9 @@
             // Listeners for config, courses, modules
             const configRef = collection(firestoreDb, 'artifacts', appId, 'public', 'data', 'config');
             onSnapshot(configRef, (snapshot) => {
-                db.config = snapshot.docs.map(doc => ({ Key: doc.id, ...doc.data() }));
+                if(!snapshot.empty) {
+                    db.config = snapshot.docs.map(doc => ({ Key: doc.id, ...doc.data() }));
+                }
                 renderConfig();
             }, (err) => console.error("Gagal load config:", err));
 
@@ -455,6 +486,12 @@
         function renderCourses() {
             const grid = document.getElementById('courseGrid');
             let htmlStr = '';
+            
+            if(db.courses.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-white/50 border border-white/10 rounded-3xl border-dashed">Belum ada Kategori Materi. Login Admin untuk menambah.</div>`;
+                return;
+            }
+
             db.courses.forEach(course => {
                 htmlStr += `
                     <div onclick="navigate('course', '${course.ID}')" class="glass glass-hover p-6 rounded-3xl cursor-pointer group flex flex-col h-full">
@@ -608,6 +645,12 @@
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             let htmlStr = '';
+            
+            if(db.courses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-white/50">Tidak ada kategori.</td></tr>`;
+                return;
+            }
+
             db.courses.forEach(c => {
                 htmlStr += `
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
@@ -685,7 +728,7 @@
                     if(idx > -1) db.config[idx].Value = newItem.Value; else db.config.push(newItem);
                 });
                 closeModal(); renderUI(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', text: 'Disimpan di sesi lokal.', icon: 'success', background: '#1a1635', color: '#fff' });
+                Swal.fire({ title: 'Tersimpan Sementara', text: 'Firebase belum terhubung. Tersimpan di sesi lokal saja.', icon: 'info', background: '#1a1635', color: '#fff' });
             }
         }
 
@@ -748,7 +791,7 @@
                     const idx = db.courses.findIndex(c => c.ID === dataObj.ID); db.courses[idx] = { ...db.courses[idx], ...dataObj }; 
                 } else { db.courses.push(dataObj); }
                 closeModal(); renderUI(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff' });
+                Swal.fire({ title: 'Tersimpan Sementara', text: 'Firebase belum terhubung. Tersimpan di sesi lokal saja.', icon: 'info', background: '#1a1635', color: '#fff' });
             }
         }
 
@@ -878,7 +921,7 @@
                     const idx = db.modules.findIndex(m => m.ID === dataObj.ID); db.modules[idx] = { ...db.modules[idx], ...dataObj }; 
                 } else { db.modules.push(dataObj); }
                 closeModal(); renderAdminModuleTable(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff' });
+                Swal.fire({ title: 'Tersimpan Sementara', text: 'Firebase belum terhubung. Tersimpan di sesi lokal saja.', icon: 'info', background: '#1a1635', color: '#fff' });
             }
         }
 

@@ -31,11 +31,13 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Mengoptimalkan efek Glassmorphism agar tidak membebani GPU */
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
-        .glass-hover:hover { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); transform: translateY(-4px); box-shadow: 0 15px 40px 0 rgba(226, 43, 226, 0.15); }
-        .glass-active { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
-        .transition-all { transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease; }
+        /* PERBAIKAN: Menggunakan warna gelap yang hampir pekat (95%) agar teks di belakang tidak menembus, TANPA menggunakan efek blur yang bikin lag */
+        .glass { background: rgba(22, 17, 45, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .glass-hover:hover { background: rgba(35, 25, 65, 0.95); border: 1px solid rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
+        .glass-active { background: rgba(50, 35, 85, 0.95); border: 1px solid rgba(255, 255, 255, 0.4); }
+        
+        /* Membatasi animasi hanya pada komponen yang paling ringan */
+        .transition-all { transition: transform 0.2s ease-out, background-color 0.2s ease-out; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }

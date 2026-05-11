@@ -286,10 +286,15 @@
                 firestoreDb = getFirestore(app);
 
                 // Authenticate to access Database
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (authErr) {
+                    console.warn("Token internal Canvas tidak cocok dengan Firebase Anda. Beralih ke Login Anonim...", authErr);
+                    await signInAnonymously(auth); // Paksa login anonim ke Firebase Anda
                 }
 
                 // Listen for Auth and Data changes

@@ -612,8 +612,9 @@
                 navMenus.classList.add('hidden');
                 mobMenuBtn.classList.add('hidden');
             } else {
-                navMenus.classList.remove('hidden');
-                navMenus.classList.add('md:flex');
+                // PERBAIKAN: Menjaga class 'hidden' agar menu desktop disembunyikan di HP,
+                // dan menambahkan 'md:flex' agar menu ini hanya muncul di layar besar (Laptop/PC).
+                navMenus.classList.add('hidden', 'md:flex');
                 mobMenuBtn.classList.remove('hidden');
                 
                 const deskAdminBtn = document.getElementById('navAdminBtn');

@@ -14,9 +14,8 @@
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK (Versi Compat untuk HTML Murni) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Konfigurasi Tema Tailwind -->
     <script>
@@ -81,7 +80,7 @@
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0914]/80 backdrop-blur-3xl transition-all duration-500">
         <div class="loader mb-4"></div>
-        <p class="text-white/70 tracking-widest text-sm animate-pulse mt-4 font-semibold tracking-[0.2em]">SINKRONISASI DATA...</p>
+        <p class="text-white/70 tracking-widest text-sm animate-pulse mt-4 font-semibold tracking-[0.2em]" id="loadingText">SINKRONISASI DATA...</p>
     </div>
 
     <!-- Modal Form -->
@@ -339,27 +338,24 @@
 
     </main>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <!-- ================= JAVASCRIPT LOGIC (SUPABASE VERSION) ================= -->
     <script>
         // =========================================================================
-        // 1. INISIALISASI FIREBASE (Konfigurasi Anda)
+        // 1. INISIALISASI SUPABASE (GANTI DENGAN KODE ANDA DARI SUPABASE DASHBOARD)
         // =========================================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyAlrbRGiuEr-42yvOGWlKx8cKeB8wVdcwg",
-            authDomain: "digitallab-ind.firebaseapp.com",
-            projectId: "digitallab-ind",
-            storageBucket: "digitallab-ind.firebasestorage.app",
-            messagingSenderId: "230367608055",
-            appId: "1:230367608055:web:ae838b9e5188f1329e67f2"
-        };
+        const SUPABASE_URL = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjMwNDUsImV4cCI6MjA5NzQzOTA0NX0.yijL1LA8GN8cWuYuDR9J43GORjmXBeKICQ0qyw_nzek"; // <-- Masukkan URL Supabase Anda di sini (contoh: https://xyz.supabase.co)
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTg2MzA0NSwiZXhwIjoyMDk3NDM5MDQ1fQ.JURfySo3EvK_QLC1gWmFu_MdH-qHCbhm6UCWfwnR0oc";
 
-        // Inisialisasi Firebase & Firestore
-        let app, firestore;
+        let supabaseClient = null;
         try {
-            app = firebase.initializeApp(firebaseConfig);
-            firestore = firebase.firestore();
+            // Membuat koneksi ke Supabase Database hanya jika URL valid
+            if (SUPABASE_URL.startsWith("http")) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.warn("URL Supabase belum diatur. Menunggu URL yang valid.");
+            }
         } catch(e) {
-            console.error("Firebase Error:", e);
+            console.error("Supabase Error:", e);
         }
 
         let db = { config: [], courses: [], modules: [], users: [] };
@@ -369,13 +365,11 @@
         let currentUserRole = 'guest';
 
         // =========================================================================
-        // 2. FUNGSI LOAD DATA & AUTO SEED
+        // 2. FUNGSI LOAD DATA & AUTO SEED (MENGGUNAKAN POSTGRESQL / SUPABASE)
         // =========================================================================
         
-        // FUNGSI BARU: Menyuntikkan data template jika database kosong
         async function seedDatabase() {
-            document.querySelector('#loadingOverlay p').innerText = "MENYIAPKAN DATA AWAL...";
-            const batch = firestore.batch();
+            document.getElementById('loadingText').innerText = "MENYIAPKAN DATA AWAL (SUPABASE)...";
             
             const defaultConfigs = [
                 { Key: "heroTitle", Value: "Kuasai AI & Iklan.<br>Skalakan Bisnis Anda." },
@@ -395,43 +389,60 @@
                 { ID: "M-1", CourseID: "CRS-1", TabType: "video", Title: "1. Basic Prompt", Content: "Video simulasi.", Link: "https://youtu.be/dQw4w9WgXcQ" }
             ];
 
-            defaultConfigs.forEach(d => batch.set(firestore.collection('Config').doc(d.Key), d));
-            defaultUsers.forEach(d => batch.set(firestore.collection('Users').doc(d.ID), d));
-            defaultCourses.forEach(d => batch.set(firestore.collection('Courses').doc(d.ID), d));
-            defaultModules.forEach(d => batch.set(firestore.collection('Modules').doc(d.ID), d));
+            // Insert Data Default ke Tabel Supabase
+            await Promise.all([
+                supabaseClient.from('Config').insert(defaultConfigs),
+                supabaseClient.from('Users').insert(defaultUsers),
+                supabaseClient.from('Courses').insert(defaultCourses),
+                supabaseClient.from('Modules').insert(defaultModules)
+            ]);
 
-            await batch.commit();
-            document.querySelector('#loadingOverlay p').innerText = "SINKRONISASI DATA...";
+            document.getElementById('loadingText').innerText = "SINKRONISASI DATA...";
         }
 
         async function loadData() {
             startLoading();
-            if (!firestore) return;
+            
+            if (!supabaseClient || SUPABASE_URL.includes("ISI_DENGAN_PROJECT_URL_SUPABASE")) {
+                endLoading();
+                Swal.fire({
+                    title: 'Supabase Belum Diatur',
+                    text: 'Harap masukkan URL dan ANON KEY dari Dashboard Supabase Anda pada kode HTML.',
+                    icon: 'warning', confirmButtonColor: '#ec4899'
+                });
+                return;
+            }
 
             try {
-                let [configSnap, coursesSnap, modulesSnap, usersSnap] = await Promise.all([
-                    firestore.collection('Config').get(),
-                    firestore.collection('Courses').get(),
-                    firestore.collection('Modules').get(),
-                    firestore.collection('Users').get()
+                // Fetch data secara parallel dari 4 Tabel di Supabase
+                let [configRes, coursesRes, modulesRes, usersRes] = await Promise.all([
+                    supabaseClient.from('Config').select('*'),
+                    supabaseClient.from('Courses').select('*'),
+                    supabaseClient.from('Modules').select('*'),
+                    supabaseClient.from('Users').select('*')
                 ]);
 
+                // Pengecekan Error: Jika tabel belum dibuat di Supabase
+                if (configRes.error || coursesRes.error || usersRes.error) {
+                    throw new Error("Tabel tidak ditemukan di Supabase. Pastikan Anda sudah menjalankan SQL Query untuk membuat Tabel.");
+                }
+
                 // JIKA DATABASE KOSONG, INJEKSI DATA DEFAULT
-                if (configSnap.empty && coursesSnap.empty && usersSnap.empty) {
+                if (configRes.data.length === 0 && coursesRes.data.length === 0 && usersRes.data.length === 0) {
                     await seedDatabase();
                     // Ambil ulang datanya setelah disuntik
-                    [configSnap, coursesSnap, modulesSnap, usersSnap] = await Promise.all([
-                        firestore.collection('Config').get(),
-                        firestore.collection('Courses').get(),
-                        firestore.collection('Modules').get(),
-                        firestore.collection('Users').get()
+                    [configRes, coursesRes, modulesRes, usersRes] = await Promise.all([
+                        supabaseClient.from('Config').select('*'),
+                        supabaseClient.from('Courses').select('*'),
+                        supabaseClient.from('Modules').select('*'),
+                        supabaseClient.from('Users').select('*')
                     ]);
                 }
 
-                db.config = configSnap.docs.map(doc => doc.data());
-                db.courses = coursesSnap.docs.map(doc => doc.data());
-                db.modules = modulesSnap.docs.map(doc => doc.data());
-                db.users = usersSnap.docs.map(doc => doc.data());
+                db.config = configRes.data || [];
+                db.courses = coursesRes.data || [];
+                db.modules = modulesRes.data || [];
+                db.users = usersRes.data || [];
 
                 renderUI(); 
                 checkAuth();
@@ -444,35 +455,38 @@
         }
 
         // =========================================================================
-        // 3. FUNGSI CRUD KE FIRESTORE (Menyimpan dan Menghapus Data)
+        // 3. FUNGSI CRUD KE SUPABASE (Menyimpan dan Menghapus Data)
         // =========================================================================
         
-        async function saveConfigToFirestore(configsToSave) {
+        async function saveConfigToSupabase(configsToSave) {
             startLoading();
             try {
-                const batch = firestore.batch();
+                // Supabase memiliki fungsi upsert: insert jika baru, update jika sudah ada (Key sebagai primary key)
+                const { error } = await supabaseClient.from('Config').upsert(configsToSave);
+                if (error) throw error;
+
+                // Update local memory
                 configsToSave.forEach(config => {
-                    const docRef = firestore.collection('Config').doc(config.Key);
-                    batch.set(docRef, config);
                     const idx = db.config.findIndex(c => c.Key === config.Key);
                     if(idx > -1) db.config[idx] = config; else db.config.push(config);
                 });
                 
-                await batch.commit();
                 closeModal(); renderUI(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', text: 'Pengaturan berhasil diupdate di Firestore.', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Tersimpan!', text: 'Pengaturan berhasil diupdate di Supabase.', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
             }
         }
 
-        async function saveCourseToFirestore(dataObj) {
+        async function saveCourseToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID;
             if (isNew) dataObj.ID = 'CRS-' + Date.now();
 
             try {
-                await firestore.collection('Courses').doc(dataObj.ID).set(dataObj);
+                const { error } = await supabaseClient.from('Courses').upsert(dataObj);
+                if (error) throw error;
+
                 if (!isNew) { const idx = db.courses.findIndex(c => c.ID === dataObj.ID); db.courses[idx] = dataObj; } 
                 else { db.courses.push(dataObj); }
                 
@@ -483,10 +497,12 @@
             }
         }
 
-        async function deleteCourseFromFirestore(id) {
+        async function deleteCourseFromSupabase(id) {
             startLoading();
             try {
-                await firestore.collection('Courses').doc(id).delete();
+                const { error } = await supabaseClient.from('Courses').delete().eq('ID', id);
+                if (error) throw error;
+
                 db.courses = db.courses.filter(c => c.ID !== id);
                 renderUI(); endLoading();
                 Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
@@ -495,13 +511,15 @@
             }
         }
 
-        async function saveModuleToFirestore(dataObj) {
+        async function saveModuleToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID || dataObj.ID === '';
             if (isNew) dataObj.ID = 'MOD-' + Date.now();
 
             try {
-                await firestore.collection('Modules').doc(dataObj.ID).set(dataObj);
+                const { error } = await supabaseClient.from('Modules').upsert(dataObj);
+                if (error) throw error;
+
                 if (!isNew) { const idx = db.modules.findIndex(m => m.ID === dataObj.ID); db.modules[idx] = dataObj; } 
                 else { db.modules.push(dataObj); }
                 
@@ -512,10 +530,12 @@
             }
         }
 
-        async function deleteModuleFromFirestore(id) {
+        async function deleteModuleFromSupabase(id) {
             startLoading();
             try {
-                await firestore.collection('Modules').doc(id).delete();
+                const { error } = await supabaseClient.from('Modules').delete().eq('ID', id);
+                if (error) throw error;
+
                 db.modules = db.modules.filter(m => m.ID !== id);
                 renderAdminModuleTable(); endLoading();
                 Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
@@ -524,13 +544,15 @@
             }
         }
 
-        async function saveUserToFirestore(dataObj) {
+        async function saveUserToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID;
             if (isNew) dataObj.ID = 'USR-' + Date.now();
 
             try {
-                await firestore.collection('Users').doc(dataObj.ID).set(dataObj);
+                const { error } = await supabaseClient.from('Users').upsert(dataObj);
+                if (error) throw error;
+
                 if (!isNew) { const idx = db.users.findIndex(u => u.ID === dataObj.ID); db.users[idx] = dataObj; } 
                 else { db.users.push(dataObj); }
                 
@@ -541,10 +563,12 @@
             }
         }
 
-        async function deleteUserFromFirestore(id) {
+        async function deleteUserFromSupabase(id) {
             startLoading();
             try {
-                await firestore.collection('Users').doc(id).delete();
+                const { error } = await supabaseClient.from('Users').delete().eq('ID', id);
+                if (error) throw error;
+
                 db.users = db.users.filter(u => u.ID !== id);
                 renderAdminUsersTable(); endLoading();
                 Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
@@ -553,18 +577,20 @@
             }
         }
 
-        async function saveMultipleUsersToFirestore(newUsers) {
+        async function saveMultipleUsersToSupabase(newUsers) {
             startLoading();
             try {
-                const batch = firestore.batch();
+                // Generate ID untuk masing-masing user baru
                 newUsers.forEach(nu => {
                     nu.ID = 'USR-' + Math.floor(Math.random() * 1000000) + Date.now().toString().slice(-4);
-                    const docRef = firestore.collection('Users').doc(nu.ID);
-                    batch.set(docRef, nu);
-                    db.users.push(nu);
                 });
+
+                // Supabase bisa melakukan Insert banyak array (bulk) sekaligus
+                const { error } = await supabaseClient.from('Users').insert(newUsers);
+                if (error) throw error;
+
+                db.users.push(...newUsers);
                 
-                await batch.commit();
                 closeModal(); renderAdminUsersTable(); endLoading();
                 Swal.fire({ title: 'Import Selesai!', text: `${newUsers.length} data berhasil ditambahkan.`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
             } catch(e) {
@@ -574,7 +600,7 @@
 
 
         // =========================================================================
-        // KODE UTILITY DAN UI STANDAR
+        // KODE UTILITY DAN UI STANDAR (SAMA SEPERTI SEBELUMNYA)
         // =========================================================================
 
         window.onload = () => {
@@ -612,8 +638,6 @@
                 navMenus.classList.add('hidden');
                 mobMenuBtn.classList.add('hidden');
             } else {
-                // PERBAIKAN: Menjaga class 'hidden' agar menu desktop disembunyikan di HP,
-                // dan menambahkan 'md:flex' agar menu ini hanya muncul di layar besar (Laptop/PC).
                 navMenus.classList.add('hidden', 'md:flex');
                 mobMenuBtn.classList.remove('hidden');
                 
@@ -857,10 +881,10 @@
                     <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex items-center justify-center transition-all"><i class="bi bi-x-lg"></i></button>
                 </div>
                 <form id="configForm">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div>
                     <button type="button" onclick="saveConfig(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-blue-600/20 text-blue-300 border border-blue-500/50 flex justify-center items-center transition-all shadow-lg shadow-blue-500/20"><i class="bi bi-save mr-2"></i> Simpan Semua Pengaturan</button>
                 </form>
             `;
@@ -870,12 +894,12 @@
         function saveConfig(e) {
             if(e) e.preventDefault();
             const configsToSave = [
-                { ID: 'heroTitle', Key: 'heroTitle', Value: document.getElementById('confTitle').value },
-                { ID: 'heroDesc', Key: 'heroDesc', Value: document.getElementById('confDesc').value },
-                { ID: 'communityLink', Key: 'communityLink', Value: document.getElementById('confLink').value },
-                { ID: 'appFont', Key: 'appFont', Value: document.getElementById('confFont').value }
+                { Key: 'heroTitle', Value: document.getElementById('confTitle').value },
+                { Key: 'heroDesc', Value: document.getElementById('confDesc').value },
+                { Key: 'communityLink', Value: document.getElementById('confLink').value },
+                { Key: 'appFont', Value: document.getElementById('confFont').value }
             ];
-            saveConfigToFirestore(configsToSave);
+            saveConfigToSupabase(configsToSave);
         }
 
         function openAdminModal(courseId = null) {
@@ -906,14 +930,14 @@
                 ID: document.getElementById('formId').value, Title: title,
                 Description: document.getElementById('formDesc').value, Icon: document.getElementById('formIcon').value || 'bi-box'
             };
-            saveCourseToFirestore(dataObj);
+            saveCourseToSupabase(dataObj);
         }
 
         function editCourse(id) { openAdminModal(id); }
         function deleteCourse(id) {
             Swal.fire({ title: 'Hapus Kategori?', text: 'Materi di dalamnya tetap ada di DB namun tidak akan tampil.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
             .then((result) => {
-                if (result.isConfirmed) { deleteCourseFromFirestore(id); }
+                if (result.isConfirmed) { deleteCourseFromSupabase(id); }
             });
         }
 
@@ -979,14 +1003,14 @@
                 TabType: document.getElementById('formModTab').value, Title: title,
                 Content: document.getElementById('formModContent').value, Link: document.getElementById('formModLink').value
             };
-            saveModuleToFirestore(dataObj);
+            saveModuleToSupabase(dataObj);
         }
 
         function editModule(id) { openModuleModal(id); }
         function deleteModule(id) {
             Swal.fire({ title: 'Hapus Materi ini?', text: 'Data tidak dapat dikembalikan!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
             .then((result) => {
-                if (result.isConfirmed) { deleteModuleFromFirestore(id); }
+                if (result.isConfirmed) { deleteModuleFromSupabase(id); }
             });
         }
 
@@ -1049,14 +1073,14 @@
             if(!name || !email || !pass) { Swal.fire('Oops', 'Semua kolom wajib diisi!', 'warning'); return; }
 
             const dataObj = { ID: document.getElementById('formUserId').value, Name: name, Email: email, Password: pass, Role: document.getElementById('formUserRole').value };
-            saveUserToFirestore(dataObj);
+            saveUserToSupabase(dataObj);
         }
 
         function editUser(id) { openUserModal(id); }
         function deleteUser(id) {
             Swal.fire({ title: 'Hapus Pengguna ini?', text: 'Siswa tidak akan bisa login lagi.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
             .then((result) => {
-                if (result.isConfirmed) { deleteUserFromFirestore(id); }
+                if (result.isConfirmed) { deleteUserFromSupabase(id); }
             });
         }
 
@@ -1104,7 +1128,7 @@
 
                 if(newUsers.length === 0) { Swal.fire('Data Kosong', 'Tidak ada baris data valid yang ditemukan untuk diimport.', 'warning'); return; }
                 
-                saveMultipleUsersToFirestore(newUsers);
+                saveMultipleUsersToSupabase(newUsers);
             };
             reader.readAsText(file);
         }

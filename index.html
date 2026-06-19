@@ -14,7 +14,7 @@
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-    <!-- SUPABASE SDK -->
+    <!-- SUPABASE SDK (Wajib ada agar variabel 'supabase' dikenali) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Konfigurasi Tema Tailwind -->
@@ -46,7 +46,7 @@
         }
         .glass-hover:hover { 
             background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); 
-            transform: translateY(-4px) scale(1.02) translateZ(0); box-shadow: 0 15px 40px 0 rgba(226, 43, 226, 0.15); 
+            transform: translateY(-4px) scale(1.02) translateZ(0); box-shadow: 0 15px 40px 0 rgba(6, 182, 212, 0.15); 
         }
         .glass-active { 
             background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); 
@@ -95,7 +95,7 @@
             <div class="flex items-center cursor-pointer hover:opacity-80 transition-all" onclick="if(isLoggedIn) navigate('home')">
                 <div class="flex flex-col">
                     <span class="text-xl md:text-2xl font-bold tracking-tight text-white leading-none">Digitallab</span>
-                    <span class="text-[10px] md:text-xs text-pink-400 uppercase tracking-widest font-bold mt-1">App Creator</span>
+                    <span class="text-[10px] md:text-xs text-cyan-400 uppercase tracking-widest font-bold mt-1">App Creator</span>
                 </div>
             </div>
             
@@ -103,7 +103,7 @@
 
             <div class="hidden space-x-2 bg-black/20 rounded-full p-1 items-center" id="nav-menus">
                 <button onclick="navigate('home')" class="nav-btn px-5 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white transition-all">Beranda</button>
-                <button onclick="navigate('admin')" id="navAdminBtn" class="nav-btn px-5 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white transition-all bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hidden shadow-lg shadow-pink-500/20">Admin Panel</button>
+                <button onclick="navigate('admin')" id="navAdminBtn" class="nav-btn px-5 py-2 rounded-full text-sm font-medium text-white/70 hover:text-white transition-all bg-gradient-to-r hover:from-blue-600 hover:to-cyan-600 hidden shadow-lg shadow-cyan-500/20">Admin Panel</button>
                 
                 <div class="w-[1px] h-6 bg-white/20 mx-2 hidden" id="navDivider"></div>
                 <button onclick="doLogout()" id="navLogoutBtn" class="hidden px-5 py-2 rounded-full text-sm font-bold text-red-400 hover:text-red-300 transition-all hover:bg-red-500/10"><i class="bi bi-box-arrow-right mr-1"></i> Logout</button>
@@ -112,7 +112,7 @@
         
         <div id="mobileMenu" class="hidden md:hidden glass mt-4 rounded-3xl p-4 flex-col space-y-2 pointer-events-auto shadow-lg">
              <button onclick="navigate('home'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-2xl glass-hover font-medium">Beranda</button>
-             <button onclick="navigate('admin'); toggleMobileMenu()" id="navMobileAdminBtn" class="w-full text-left px-4 py-3 rounded-2xl glass-hover font-medium text-pink-400 hidden">Admin Panel</button>
+             <button onclick="navigate('admin'); toggleMobileMenu()" id="navMobileAdminBtn" class="w-full text-left px-4 py-3 rounded-2xl glass-hover font-medium text-cyan-400 hidden">Admin Panel</button>
              <div class="h-[1px] w-full bg-white/10 my-1 hidden" id="navMobileDivider"></div>
              <button onclick="doLogout(); toggleMobileMenu()" id="navMobileLogoutBtn" class="hidden w-full text-left px-4 py-3 rounded-2xl glass-hover font-bold text-red-400"><i class="bi bi-box-arrow-right mr-2"></i> Logout</button>
         </div>
@@ -134,17 +134,17 @@
                             <label class="block text-sm font-medium text-white/70 mb-2">Email Akses</label>
                             <div class="relative">
                                 <i class="bi bi-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40"></i>
-                                <input type="email" id="loginEmail" required class="w-full bg-black/30 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner" placeholder="Masukkan email...">
+                                <input type="email" id="loginEmail" required class="w-full bg-black/30 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner" placeholder="Masukkan email...">
                             </div>
                         </div>
                         <div class="mb-8">
                             <label class="block text-sm font-medium text-white/70 mb-2">Kata Sandi</label>
                             <div class="relative">
                                 <i class="bi bi-key absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40"></i>
-                                <input type="password" id="loginPass" required class="w-full bg-black/30 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner" placeholder="••••••••">
+                                <input type="password" id="loginPass" required class="w-full bg-black/30 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner" placeholder="••••••••">
                             </div>
                         </div>
-                        <button type="submit" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-pink-600/20 text-pink-300 border border-pink-500/50 flex justify-center items-center transition-all shadow-lg shadow-pink-500/20">
+                        <button type="submit" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20">
                             <i class="bi bi-box-arrow-in-right mr-2 text-lg"></i> Masuk Sekarang
                         </button>
                     </form>
@@ -155,7 +155,7 @@
         <!-- VIEW: BERANDA -->
         <section id="view-home" class="spa-view hidden animate-[fadeIn_0.5s_ease-out]">
             <div class="text-center mt-6 mb-16">
-                <div class="inline-block glass px-4 py-1.5 rounded-full text-xs font-semibold text-pink-400 tracking-wider mb-6">
+                <div class="inline-block glass px-4 py-1.5 rounded-full text-xs font-semibold text-cyan-400 tracking-wider mb-6">
                     <i class="bi bi-stars mr-1"></i> WELCOME TO THE FUTURE
                 </div>
                 <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
@@ -165,7 +165,7 @@
                     Pusat sumber daya digital eksklusif. Pelajari strategi periklanan modern.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button onclick="document.getElementById('kategori-section').scrollIntoView({behavior:'smooth'})" class="glass glass-hover px-8 py-4 rounded-full font-semibold text-white transition-all flex items-center justify-center shadow-lg shadow-purple-500/10">
+                    <button onclick="document.getElementById('kategori-section').scrollIntoView({behavior:'smooth'})" class="glass glass-hover px-8 py-4 rounded-full font-semibold text-white transition-all flex items-center justify-center shadow-lg shadow-blue-500/10">
                         Jelajahi Materi <i class="bi bi-arrow-down ml-2"></i>
                     </button>
                     <button id="btn-community" onclick="window.open('#', '_blank')" class="glass glass-hover px-8 py-4 rounded-full font-semibold text-white transition-all flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/20">
@@ -177,10 +177,10 @@
             <!-- Fitur Pencarian -->
             <div class="max-w-xl mx-auto mb-12 relative">
                 <i class="bi bi-search absolute left-6 top-1/2 transform -translate-y-1/2 text-white/40 text-lg"></i>
-                <input type="text" id="searchInput" onkeyup="filterCourses()" placeholder="Cari Kategori atau Modul..." class="w-full glass glass-active border border-white/10 rounded-full py-4 pl-16 pr-6 text-white focus:outline-none focus:border-pink-500 transition-all shadow-lg text-lg">
+                <input type="text" id="searchInput" onkeyup="filterCourses()" placeholder="Cari Kategori atau Modul..." class="w-full glass glass-active border border-white/10 rounded-full py-4 pl-16 pr-6 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-lg text-lg">
             </div>
 
-            <h2 id="kategori-section" class="text-2xl font-bold mb-8 pl-4 border-l-4 border-pink-500">Kategori Modul</h2>
+            <h2 id="kategori-section" class="text-2xl font-bold mb-8 pl-4 border-l-4 border-cyan-500">Kategori Modul</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courseGrid"></div>
         </section>
 
@@ -205,7 +205,7 @@
 
             <div class="glass rounded-4xl p-6 md:p-10 min-h-[400px]">
                 <div id="content-video" class="tab-content block">
-                    <h3 class="text-2xl font-bold mb-6 flex items-center"><i class="bi bi-play-btn-fill text-pink-500 mr-3"></i> Daftar Pelajaran</h3>
+                    <h3 class="text-2xl font-bold mb-6 flex items-center"><i class="bi bi-play-btn-fill text-cyan-500 mr-3"></i> Daftar Pelajaran</h3>
                     <div class="space-y-4" id="videoList"></div>
                 </div>
                 <div id="content-tools" class="tab-content hidden">
@@ -227,7 +227,7 @@
         <section id="view-admin" class="spa-view hidden animate-[fadeIn_0.5s_ease-out]">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
-                    <h1 class="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Admin Panel</h1>
+                    <h1 class="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Admin Panel</h1>
                     <p class="text-white/60">Kelola kategori modul dan pengaturan web.</p>
                 </div>
                 <div class="flex gap-2 flex-wrap">
@@ -237,7 +237,7 @@
                     <button onclick="openConfigModal()" class="glass glass-hover px-4 md:px-6 py-3 rounded-full font-semibold bg-blue-500/20 text-blue-300 border-blue-500/50 text-sm md:text-base">
                         <i class="bi bi-gear"></i> <span class="hidden md:inline ml-2">Pengaturan Umum</span>
                     </button>
-                    <button onclick="openAdminModal()" class="glass glass-hover px-4 md:px-6 py-3 rounded-full font-semibold bg-pink-500/20 text-pink-300 border-pink-500/50 text-sm md:text-base">
+                    <button onclick="openAdminModal()" class="glass glass-hover px-4 md:px-6 py-3 rounded-full font-semibold bg-cyan-500/20 text-cyan-300 border-cyan-500/50 text-sm md:text-base">
                         <i class="bi bi-plus-lg"></i> <span class="hidden md:inline ml-2">Tambah Kategori</span>
                     </button>
                 </div>
@@ -309,7 +309,7 @@
                     <button onclick="downloadCsvTemplate()" class="glass glass-hover px-4 py-3 rounded-full font-semibold bg-yellow-500/20 text-yellow-300 border-yellow-500/50 text-sm">
                         <i class="bi bi-download mr-1"></i> Template CSV
                     </button>
-                    <button onclick="openImportCsvModal()" class="glass glass-hover px-4 py-3 rounded-full font-semibold bg-purple-500/20 text-purple-300 border-purple-500/50 text-sm shadow-purple-500/20">
+                    <button onclick="openImportCsvModal()" class="glass glass-hover px-4 py-3 rounded-full font-semibold bg-blue-500/20 text-blue-300 border-blue-500/50 text-sm shadow-blue-500/20">
                         <i class="bi bi-upload mr-1"></i> Import CSV
                     </button>
                     <button onclick="openUserModal()" class="glass glass-hover px-4 py-3 rounded-full font-semibold bg-green-500/20 text-green-300 border-green-500/50 text-sm">
@@ -341,21 +341,21 @@
     <!-- ================= JAVASCRIPT LOGIC (SUPABASE VERSION) ================= -->
     <script>
         // =========================================================================
-        // 1. INISIALISASI SUPABASE (GANTI DENGAN KODE ANDA DARI SUPABASE DASHBOARD)
+        // 1. INISIALISASI SUPABASE
         // =========================================================================
-        const SUPABASE_URL = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjMwNDUsImV4cCI6MjA5NzQzOTA0NX0.yijL1LA8GN8cWuYuDR9J43GORjmXBeKICQ0qyw_nzek"; // <-- Masukkan URL Supabase Anda di sini (contoh: https://xyz.supabase.co)
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTg2MzA0NSwiZXhwIjoyMDk3NDM5MDQ1fQ.JURfySo3EvK_QLC1gWmFu_MdH-qHCbhm6UCWfwnR0oc";
+        const SUPABASE_URL = "https://symosziztbktkshayvui.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjMwNDUsImV4cCI6MjA5NzQzOTA0NX0.yijL1LA8GN8cWuYuDR9J43GORjmXBeKICQ0qyw_nzek"; 
 
         let supabaseClient = null;
         try {
-            // Membuat koneksi ke Supabase Database hanya jika URL valid
-            if (SUPABASE_URL.startsWith("http")) {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // Memastikan library global window.supabase dari tag <script> di <head> sudah termuat
+            if (typeof window.supabase !== 'undefined') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                console.warn("URL Supabase belum diatur. Menunggu URL yang valid.");
+                console.error("Supabase SDK gagal dimuat. Pastikan tag <script> Supabase ada di bagian <head>.");
             }
         } catch(e) {
-            console.error("Supabase Error:", e);
+            console.error("Supabase Init Error:", e);
         }
 
         let db = { config: [], courses: [], modules: [], users: [] };
@@ -369,6 +369,7 @@
         // =========================================================================
         
         async function seedDatabase() {
+            if (!supabaseClient) return;
             document.getElementById('loadingText').innerText = "MENYIAPKAN DATA AWAL (SUPABASE)...";
             
             const defaultConfigs = [
@@ -403,11 +404,11 @@
         async function loadData() {
             startLoading();
             
-            if (!supabaseClient || SUPABASE_URL.includes("ISI_DENGAN_PROJECT_URL_SUPABASE")) {
+            if (!supabaseClient) {
                 endLoading();
                 Swal.fire({
-                    title: 'Supabase Belum Diatur',
-                    text: 'Harap masukkan URL dan ANON KEY dari Dashboard Supabase Anda pada kode HTML.',
+                    title: 'SDK Tidak Ditemukan',
+                    text: 'Tidak dapat memuat Supabase. Pastikan Anda memiliki koneksi internet untuk mengunduh library.',
                     icon: 'warning', confirmButtonColor: '#ec4899'
                 });
                 return;
@@ -472,7 +473,7 @@
                 });
                 
                 closeModal(); renderUI(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', text: 'Pengaturan berhasil diupdate di Supabase.', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Tersimpan!', text: 'Pengaturan berhasil diupdate di Supabase.', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
             }
@@ -491,7 +492,7 @@
                 else { db.courses.push(dataObj); }
                 
                 closeModal(); renderUI(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
             }
@@ -505,7 +506,7 @@
 
                 db.courses = db.courses.filter(c => c.ID !== id);
                 renderUI(); endLoading();
-                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
+                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
             }
@@ -524,7 +525,7 @@
                 else { db.modules.push(dataObj); }
                 
                 closeModal(); renderAdminModuleTable(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
             }
@@ -538,7 +539,7 @@
 
                 db.modules = db.modules.filter(m => m.ID !== id);
                 renderAdminModuleTable(); endLoading();
-                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
+                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
             }
@@ -557,7 +558,7 @@
                 else { db.users.push(dataObj); }
                 
                 closeModal(); renderAdminUsersTable(); endLoading();
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
             }
@@ -571,7 +572,7 @@
 
                 db.users = db.users.filter(u => u.ID !== id);
                 renderAdminUsersTable(); endLoading();
-                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
+                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
             }
@@ -592,7 +593,7 @@
                 db.users.push(...newUsers);
                 
                 closeModal(); renderAdminUsersTable(); endLoading();
-                Swal.fire({ title: 'Import Selesai!', text: `${newUsers.length} data berhasil ditambahkan.`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899' });
+                Swal.fire({ title: 'Import Selesai!', text: `${newUsers.length} data berhasil ditambahkan.`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
             } catch(e) {
                 endLoading(); Swal.fire('Gagal Import', e.message, 'error');
             }
@@ -638,7 +639,8 @@
                 navMenus.classList.add('hidden');
                 mobMenuBtn.classList.add('hidden');
             } else {
-                navMenus.classList.add('hidden', 'md:flex');
+                navMenus.classList.remove('hidden');
+                navMenus.classList.add('md:flex');
                 mobMenuBtn.classList.remove('hidden');
                 
                 const deskAdminBtn = document.getElementById('navAdminBtn');
@@ -689,10 +691,10 @@
                 localStorage.setItem('digitallab_session', JSON.stringify({ role: user.Role, email: user.Email }));
                 
                 checkAuth(); navigate('home');
-                Swal.fire({title: 'Login Berhasil!', text: `Selamat datang, ${user.Name}!`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899', timer: 1500, showConfirmButton: false});
+                Swal.fire({title: 'Login Berhasil!', text: `Selamat datang, ${user.Name}!`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4', timer: 1500, showConfirmButton: false});
                 document.getElementById('loginForm').reset();
             } else {
-                Swal.fire({title: 'Akses Ditolak!', text: 'Email atau Kata Sandi salah.', icon: 'error', background: '#1a1635', color: '#fff', confirmButtonColor: '#ec4899'});
+                Swal.fire({title: 'Akses Ditolak!', text: 'Email atau Kata Sandi salah.', icon: 'error', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
             }
         }
 
@@ -767,7 +769,7 @@
             db.courses.forEach(course => {
                 htmlStr += `
                     <div onclick="navigate('course', '${course.ID}')" data-title="${escapeHtml(course.Title)}" data-desc="${escapeHtml(course.Description)}" class="course-card glass glass-hover p-6 rounded-3xl cursor-pointer group flex flex-col h-full">
-                        <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl mb-4 group-hover:bg-pink-500/20 group-hover:text-pink-300 transition-all shadow-md shadow-black/20">
+                        <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl mb-4 group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all shadow-md shadow-black/20">
                             <i class="bi ${course.Icon}"></i>
                         </div>
                         <h3 class="text-2xl font-bold mb-2">${escapeHtml(course.Title)}</h3>
@@ -810,7 +812,7 @@
                     htmlStr += `
                         <div class="glass rounded-2xl overflow-hidden mb-3">
                             <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/5 transition-all" onclick="toggleAccordion('acc-${idx}')">
-                                <span class="font-semibold flex items-center text-lg"><i class="bi bi-play-circle-fill text-pink-400 mr-3 text-2xl drop-shadow-md"></i> ${escapeHtml(mod.Title)}</span>
+                                <span class="font-semibold flex items-center text-lg"><i class="bi bi-play-circle-fill text-cyan-400 mr-3 text-2xl drop-shadow-md"></i> ${escapeHtml(mod.Title)}</span>
                                 <i class="bi bi-chevron-down text-white/50 transition-transform duration-300" id="icon-acc-${idx}"></i>
                             </button>
                             <div id="acc-${idx}" class="accordion-content bg-black/20">
@@ -858,11 +860,11 @@
                 htmlStr += `
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
                         <td class="p-5 text-sm text-white/50">${c.ID}</td>
-                        <td class="p-5"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-pink-300"><i class="bi ${c.Icon} text-lg"></i></div></td>
+                        <td class="p-5"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-cyan-300"><i class="bi ${c.Icon} text-lg"></i></div></td>
                         <td class="p-5 font-bold">${escapeHtml(c.Title)}</td>
                         <td class="p-5 text-sm text-white/60 truncate max-w-xs">${escapeHtml(c.Description)}</td>
                         <td class="p-5 text-right">
-                            <button onclick="manageModules('${c.ID}')" class="text-purple-400 hover:text-white hover:bg-purple-500 mr-2 px-3 py-1.5 rounded-lg bg-purple-400/10 transition-all font-medium text-sm"><i class="bi bi-collection-play mr-1"></i> Materi</button>
+                            <button onclick="manageModules('${c.ID}')" class="text-blue-400 hover:text-white hover:bg-blue-500 mr-2 px-3 py-1.5 rounded-lg bg-blue-400/10 transition-all font-medium text-sm"><i class="bi bi-collection-play mr-1"></i> Materi</button>
                             <button onclick="editCourse('${c.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button>
                             <button onclick="deleteCourse('${c.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button>
                         </td>
@@ -881,11 +883,11 @@
                     <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex items-center justify-center transition-all"><i class="bi bi-x-lg"></i></button>
                 </div>
                 <form id="configForm">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div>
-                    <button type="button" onclick="saveConfig(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-blue-600/20 text-blue-300 border border-blue-500/50 flex justify-center items-center transition-all shadow-lg shadow-blue-500/20"><i class="bi bi-save mr-2"></i> Simpan Semua Pengaturan</button>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div>
+                    <button type="button" onclick="saveConfig(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> Simpan Semua Pengaturan</button>
                 </form>
             `;
             showModal();
@@ -912,10 +914,10 @@
                 </div>
                 <form id="courseForm">
                     <input type="hidden" id="formId" value="${escapeHtml(course.ID)}">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Kategori</label><input type="text" id="formTitle" value="${escapeHtml(course.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat</label><textarea id="formDesc" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(course.Description)}</textarea></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Class Icon (Bootstrap Icons)</label><input type="text" id="formIcon" value="${escapeHtml(course.Icon)}" placeholder="bi-robot" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <button type="button" onclick="saveCourse(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-pink-600/20 text-pink-300 border border-pink-500/50 flex justify-center items-center transition-all shadow-lg shadow-pink-500/20"><i class="bi bi-save mr-2"></i> ${courseId ? 'Update Data' : 'Simpan Kategori Baru'}</button>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Kategori</label><input type="text" id="formTitle" value="${escapeHtml(course.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat</label><textarea id="formDesc" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(course.Description)}</textarea></div>
+                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Class Icon (Bootstrap Icons)</label><input type="text" id="formIcon" value="${escapeHtml(course.Icon)}" placeholder="bi-robot" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
+                    <button type="button" onclick="saveCourse(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> ${courseId ? 'Update Data' : 'Simpan Kategori Baru'}</button>
                 </form>
             `;
             showModal();
@@ -955,7 +957,7 @@
             if(modules.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-white/50 bg-white/5 rounded-b-xl border-t border-white/5">Belum ada materi untuk kategori ini.</td></tr>`; return; }
 
             modules.forEach(m => {
-                let typeBadge = m.TabType === 'video' ? '<span class="bg-pink-500/20 text-pink-300 border border-pink-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-play-circle mr-1"></i> Video</span>' : 
+                let typeBadge = m.TabType === 'video' ? '<span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-play-circle mr-1"></i> Video</span>' : 
                                (m.TabType === 'tools' ? '<span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-tools mr-1"></i> Tools</span>' : 
                                (m.TabType === 'docs' ? '<span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-journal mr-1"></i> E-Book</span>' : 
                                '<span class="bg-green-500/20 text-green-300 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-gift mr-1"></i> Bonus</span>'));
@@ -1095,8 +1097,8 @@
         function openImportCsvModal() {
             document.getElementById('modalContent').innerHTML = `
                 <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">Import CSV Pengguna</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button></div>
-                <div class="mb-4"><p class="text-white/60 text-sm mb-4 leading-relaxed">Pilih file CSV yang sudah diisi sesuai template.<br>Format Header: <b>Name, Email, Password, Role</b> (Gunakan pemisah koma atau titik koma).</p><input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-white/70 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30 transition-all cursor-pointer"></div>
-                <button type="button" onclick="processCsvImport()" class="w-full mt-6 glass glass-hover py-4 rounded-xl font-bold bg-purple-600/20 text-purple-300 border border-purple-500/50 flex justify-center items-center transition-all shadow-lg shadow-purple-500/20"><i class="bi bi-upload mr-2"></i> Mulai Import Data</button>
+                <div class="mb-4"><p class="text-white/60 text-sm mb-4 leading-relaxed">Pilih file CSV yang sudah diisi sesuai template.<br>Format Header: <b>Name, Email, Password, Role</b> (Gunakan pemisah koma atau titik koma).</p><input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-white/70 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-300 hover:file:bg-blue-500/30 transition-all cursor-pointer"></div>
+                <button type="button" onclick="processCsvImport()" class="w-full mt-6 glass glass-hover py-4 rounded-xl font-bold bg-blue-600/20 text-blue-300 border border-blue-500/50 flex justify-center items-center transition-all shadow-lg shadow-blue-500/20"><i class="bi bi-upload mr-2"></i> Mulai Import Data</button>
             `;
             showModal();
         }

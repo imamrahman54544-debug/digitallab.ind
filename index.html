@@ -14,7 +14,7 @@
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-    <!-- SUPABASE SDK (Wajib ada agar variabel 'supabase' dikenali) -->
+    <!-- SUPABASE SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Konfigurasi Tema Tailwind -->
@@ -41,9 +41,7 @@
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
         }
-        .glass-hover {
-            will-change: transform; 
-        }
+        .glass-hover { will-change: transform; }
         .glass-hover:hover { 
             background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); 
             transform: translateY(-4px) scale(1.02) translateZ(0); box-shadow: 0 15px 40px 0 rgba(6, 182, 212, 0.15); 
@@ -52,11 +50,7 @@
             background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); 
         }
         
-        .transition-all { 
-            transition-property: transform, background-color, border-color, box-shadow, opacity; 
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
-            transition-duration: 300ms; 
-        }
+        .transition-all { transition-property: transform, background-color, border-color, box-shadow, opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
@@ -68,7 +62,6 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
     </style>
 </head>
@@ -83,7 +76,7 @@
         <p class="text-white/70 tracking-widest text-sm animate-pulse mt-4 font-semibold tracking-[0.2em]" id="loadingText">SINKRONISASI DATA...</p>
     </div>
 
-    <!-- Modal Form -->
+    <!-- Modal Form Umum -->
     <div id="glassModal" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 transition-all duration-300">
         <div class="glass rounded-4xl p-8 w-full max-w-lg transform scale-95 transition-all duration-300 max-h-[90vh] overflow-y-auto" id="modalContent"></div>
     </div>
@@ -121,7 +114,7 @@
     <!-- KONTEN UTAMA SPA -->
     <main class="pt-36 pb-20 px-4 md:px-12 max-w-7xl mx-auto">
         
-        <!-- VIEW: LOGIN PAGE (GATEKEEPER) -->
+        <!-- VIEW: LOGIN PAGE -->
         <section id="view-login" class="spa-view hidden animate-[fadeIn_0.5s_ease-out]">
             <div class="min-h-[65vh] flex flex-col justify-center items-center">
                 <div class="glass p-8 md:p-12 rounded-5xl w-full max-w-md relative z-10 shadow-2xl">
@@ -148,6 +141,12 @@
                             <i class="bi bi-box-arrow-in-right mr-2 text-lg"></i> Masuk Sekarang
                         </button>
                     </form>
+                    
+                    <!-- TOMBOL DAFTAR BARU -->
+                    <div class="mt-6 text-center border-t border-white/10 pt-6">
+                        <p class="text-white/50 text-sm mb-3">Belum memiliki akun?</p>
+                        <button onclick="openSignupModal()" class="text-cyan-400 font-semibold hover:text-cyan-300 transition-all text-sm"><i class="bi bi-person-plus mr-1"></i> Daftar Akun Siswa Baru</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -174,7 +173,6 @@
                 </div>
             </div>
 
-            <!-- Fitur Pencarian -->
             <div class="max-w-xl mx-auto mb-12 relative">
                 <i class="bi bi-search absolute left-6 top-1/2 transform -translate-y-1/2 text-white/40 text-lg"></i>
                 <input type="text" id="searchInput" onkeyup="filterCourses()" placeholder="Cari Kategori atau Modul..." class="w-full glass glass-active border border-white/10 rounded-full py-4 pl-16 pr-6 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-lg text-lg">
@@ -325,7 +323,7 @@
                             <tr class="bg-white/5 border-b border-white/10">
                                 <th class="p-5 font-semibold text-white/70">Nama Pengguna</th>
                                 <th class="p-5 font-semibold text-white/70">Email</th>
-                                <th class="p-5 font-semibold text-white/70">Password</th>
+                                <th class="p-5 font-semibold text-white/70">Password (Tabel Internal)</th>
                                 <th class="p-5 font-semibold text-white/70">Akses / Role</th>
                                 <th class="p-5 font-semibold text-white/70 text-right">Aksi</th>
                             </tr>
@@ -340,23 +338,17 @@
 
     <!-- ================= JAVASCRIPT LOGIC (SUPABASE VERSION) ================= -->
     <script>
-        // =========================================================================
-        // 1. INISIALISASI SUPABASE
-        // =========================================================================
         const SUPABASE_URL = "https://symosziztbktkshayvui.supabase.co"; 
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bW9zeml6dGJrdGtzaGF5dnVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NjMwNDUsImV4cCI6MjA5NzQzOTA0NX0.yijL1LA8GN8cWuYuDR9J43GORjmXBeKICQ0qyw_nzek"; 
 
         let supabaseClient = null;
         try {
-            // Memastikan library global window.supabase dari tag <script> di <head> sudah termuat
             if (typeof window.supabase !== 'undefined') {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                 console.error("Supabase SDK gagal dimuat. Pastikan tag <script> Supabase ada di bagian <head>.");
             }
-        } catch(e) {
-            console.error("Supabase Init Error:", e);
-        }
+        } catch(e) { console.error("Supabase Init Error:", e); }
 
         let db = { config: [], courses: [], modules: [], users: [] };
         let currentCourseId = null;
@@ -365,9 +357,8 @@
         let currentUserRole = 'guest';
 
         // =========================================================================
-        // 2. FUNGSI LOAD DATA & AUTO SEED (MENGGUNAKAN POSTGRESQL / SUPABASE)
+        // DATA LOAD & SEEDING
         // =========================================================================
-        
         async function seedDatabase() {
             if (!supabaseClient) return;
             document.getElementById('loadingText').innerText = "MENYIAPKAN DATA AWAL (SUPABASE)...";
@@ -390,32 +381,20 @@
                 { ID: "M-1", CourseID: "CRS-1", TabType: "video", Title: "1. Basic Prompt", Content: "Video simulasi.", Link: "https://youtu.be/dQw4w9WgXcQ" }
             ];
 
-            // Insert Data Default ke Tabel Supabase
             await Promise.all([
                 supabaseClient.from('Config').insert(defaultConfigs),
                 supabaseClient.from('Users').insert(defaultUsers),
                 supabaseClient.from('Courses').insert(defaultCourses),
                 supabaseClient.from('Modules').insert(defaultModules)
             ]);
-
             document.getElementById('loadingText').innerText = "SINKRONISASI DATA...";
         }
 
         async function loadData() {
             startLoading();
-            
-            if (!supabaseClient) {
-                endLoading();
-                Swal.fire({
-                    title: 'SDK Tidak Ditemukan',
-                    text: 'Tidak dapat memuat Supabase. Pastikan Anda memiliki koneksi internet untuk mengunduh library.',
-                    icon: 'warning', confirmButtonColor: '#ec4899'
-                });
-                return;
-            }
+            if (!supabaseClient) { endLoading(); Swal.fire('SDK Tidak Ditemukan', 'Tidak dapat memuat Supabase.', 'warning'); return; }
 
             try {
-                // Fetch data secara parallel dari 4 Tabel di Supabase
                 let [configRes, coursesRes, modulesRes, usersRes] = await Promise.all([
                     supabaseClient.from('Config').select('*'),
                     supabaseClient.from('Courses').select('*'),
@@ -423,79 +402,211 @@
                     supabaseClient.from('Users').select('*')
                 ]);
 
-                // Pengecekan Error: Jika tabel belum dibuat di Supabase
                 if (configRes.error || coursesRes.error || usersRes.error) {
-                    throw new Error("Tabel tidak ditemukan di Supabase. Pastikan Anda sudah menjalankan SQL Query untuk membuat Tabel.");
+                    throw new Error("Tabel tidak ditemukan di Supabase.");
                 }
 
-                // JIKA DATABASE KOSONG, INJEKSI DATA DEFAULT
                 if (configRes.data.length === 0 && coursesRes.data.length === 0 && usersRes.data.length === 0) {
                     await seedDatabase();
-                    // Ambil ulang datanya setelah disuntik
                     [configRes, coursesRes, modulesRes, usersRes] = await Promise.all([
-                        supabaseClient.from('Config').select('*'),
-                        supabaseClient.from('Courses').select('*'),
-                        supabaseClient.from('Modules').select('*'),
-                        supabaseClient.from('Users').select('*')
+                        supabaseClient.from('Config').select('*'), supabaseClient.from('Courses').select('*'),
+                        supabaseClient.from('Modules').select('*'), supabaseClient.from('Users').select('*')
                     ]);
                 }
 
-                db.config = configRes.data || [];
-                db.courses = coursesRes.data || [];
-                db.modules = modulesRes.data || [];
-                db.users = usersRes.data || [];
+                db.config = configRes.data || []; db.courses = coursesRes.data || [];
+                db.modules = modulesRes.data || []; db.users = usersRes.data || [];
 
-                renderUI(); 
-                checkAuth();
-                navigate(isLoggedIn ? 'home' : 'login'); 
-            } catch(e) {
-                Swal.fire('Koneksi Error', e.message, 'error');
-            } finally {
-                endLoading();
-            }
+                // Validasi session auth bawaan Supabase
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                // Pengecekan fallback dengan localstorage
+                const savedSession = localStorage.getItem('digitallab_session');
+                
+                if(session) {
+                    // Jika ada sesi Supabase asli
+                    isLoggedIn = true;
+                    // Cek role di tabel users buatan kita
+                    const userRecord = db.users.find(u => u.Email === session.user.email);
+                    currentUserRole = userRecord ? userRecord.Role : 'student'; // default student
+                } else if (savedSession) {
+                    // Jika login manual via tabel custom
+                    const parsed = JSON.parse(savedSession);
+                    isLoggedIn = true;
+                    currentUserRole = parsed.role;
+                }
+
+                renderUI(); checkAuth(); navigate(isLoggedIn ? 'home' : 'login'); 
+            } catch(e) { Swal.fire('Koneksi Error', e.message, 'error'); } finally { endLoading(); }
         }
 
         // =========================================================================
-        // 3. FUNGSI CRUD KE SUPABASE (Menyimpan dan Menghapus Data)
+        // AUTENTIKASI: LOGIN & SIGN UP
         // =========================================================================
-        
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            startLoading();
+
+            // 1. Coba login menggunakan fitur Supabase Auth
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: pass
+            });
+
+            if (!error && data.session) {
+                // Login Auth berhasil!
+                isLoggedIn = true;
+                
+                // Cari profilnya di tabel kustom kita
+                let userProfile = db.users.find(u => u.Email === email);
+                currentUserRole = userProfile ? userProfile.Role : 'student';
+                
+                localStorage.setItem('digitallab_session', JSON.stringify({ role: currentUserRole, email: email }));
+                
+                endLoading();
+                checkAuth(); navigate('home');
+                Swal.fire({title: 'Login Berhasil!', text: `Selamat datang kembali!`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4', timer: 1500, showConfirmButton: false});
+                document.getElementById('loginForm').reset();
+                return;
+            }
+
+            // 2. FALLBACK: Jika gagal di Auth, cek tabel `Users` kustom kita (Untuk backward compatibility data lama)
+            let userCustom = db.users.find(u => u.Email === email && u.Password === pass);
+            
+            if (userCustom) {
+                isLoggedIn = true;
+                currentUserRole = userCustom.Role;
+                localStorage.setItem('digitallab_session', JSON.stringify({ role: userCustom.Role, email: userCustom.Email }));
+                
+                endLoading();
+                checkAuth(); navigate('home');
+                Swal.fire({title: 'Login Berhasil (Internal)!', text: `Selamat datang, ${userCustom.Name}!`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4', timer: 1500, showConfirmButton: false});
+                document.getElementById('loginForm').reset();
+            } else {
+                endLoading();
+                Swal.fire({title: 'Akses Ditolak!', text: error ? error.message : 'Email atau Kata Sandi salah.', icon: 'error', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
+            }
+        }
+
+        async function doLogout() {
+            Swal.fire({
+                title: 'Konfirmasi Keluar', text: 'Sesi anda akan diakhiri.', icon: 'question', background: '#1a1635', color: '#fff',
+                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Logout', cancelButtonText: 'Batal'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    startLoading();
+                    await supabaseClient.auth.signOut(); // Sign out dari Supabase Auth
+                    isLoggedIn = false; currentUserRole = 'guest'; localStorage.removeItem('digitallab_session');
+                    endLoading();
+                    checkAuth(); navigate('login');
+                }
+            });
+        }
+
+        // --- FITUR BARU: SIGN UP SISWA ---
+        function openSignupModal() {
+            document.getElementById('modalContent').innerHTML = `
+                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h3 class="text-2xl font-bold">Daftar Akun Baru</h3>
+                    <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex items-center justify-center transition-all"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <form id="signupForm" onsubmit="processSignup(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm text-white/70 mb-2 font-medium">Nama Lengkap</label>
+                        <input type="text" id="regName" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner" placeholder="Masukkan nama Anda...">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm text-white/70 mb-2 font-medium">Email Valid</label>
+                        <input type="email" id="regEmail" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner" placeholder="contoh@email.com">
+                    </div>
+                    <div class="mb-8">
+                        <label class="block text-sm text-white/70 mb-2 font-medium">Buat Kata Sandi (Min. 6 Karakter)</label>
+                        <input type="password" id="regPass" minlength="6" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20">
+                        <i class="bi bi-person-plus-fill mr-2"></i> Buat Akun Sekarang
+                    </button>
+                </form>
+            `;
+            showModal();
+        }
+
+        async function processSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+
+            startLoading();
+
+            try {
+                // 1. Mendaftarkan user ke Supabase Auth
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: pass,
+                });
+
+                if (authError) throw authError;
+
+                // 2. Menyimpan Profil ke Tabel kustom `Users` kita (default role: student)
+                const newUserId = 'USR-' + Date.now();
+                const newUserProfile = { ID: newUserId, Name: name, Email: email, Password: pass, Role: 'student' };
+                
+                const { error: dbError } = await supabaseClient.from('Users').insert([newUserProfile]);
+                if (dbError) throw dbError;
+
+                // Update memori lokal
+                db.users.push(newUserProfile);
+                
+                closeModal();
+                endLoading();
+
+                // Munculkan notifikasi sukses (Mungkin perlu verifikasi email tergantung setting Supabase Anda)
+                Swal.fire({
+                    title: 'Pendaftaran Berhasil!', 
+                    text: 'Akun Anda telah dibuat. Jika Supabase mewajibkan konfirmasi, silakan cek kotak masuk email Anda sebelum Login.', 
+                    icon: 'success', 
+                    background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'
+                });
+
+            } catch (error) {
+                endLoading();
+                Swal.fire({title: 'Pendaftaran Gagal', text: error.message, icon: 'error', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
+            }
+        }
+
+
+        // =========================================================================
+        // CRUD SUPABASE: PENGATURAN, KATEGORI, MODUL
+        // =========================================================================
         async function saveConfigToSupabase(configsToSave) {
             startLoading();
             try {
-                // Supabase memiliki fungsi upsert: insert jika baru, update jika sudah ada (Key sebagai primary key)
                 const { error } = await supabaseClient.from('Config').upsert(configsToSave);
                 if (error) throw error;
-
-                // Update local memory
                 configsToSave.forEach(config => {
                     const idx = db.config.findIndex(c => c.Key === config.Key);
                     if(idx > -1) db.config[idx] = config; else db.config.push(config);
                 });
-                
                 closeModal(); renderUI(); endLoading();
                 Swal.fire({ title: 'Tersimpan!', text: 'Pengaturan berhasil diupdate di Supabase.', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error'); }
         }
 
         async function saveCourseToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID;
             if (isNew) dataObj.ID = 'CRS-' + Date.now();
-
             try {
                 const { error } = await supabaseClient.from('Courses').upsert(dataObj);
                 if (error) throw error;
-
-                if (!isNew) { const idx = db.courses.findIndex(c => c.ID === dataObj.ID); db.courses[idx] = dataObj; } 
-                else { db.courses.push(dataObj); }
-                
+                if (!isNew) { const idx = db.courses.findIndex(c => c.ID === dataObj.ID); db.courses[idx] = dataObj; } else { db.courses.push(dataObj); }
                 closeModal(); renderUI(); endLoading();
                 Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error'); }
         }
 
         async function deleteCourseFromSupabase(id) {
@@ -503,32 +614,23 @@
             try {
                 const { error } = await supabaseClient.from('Courses').delete().eq('ID', id);
                 if (error) throw error;
-
                 db.courses = db.courses.filter(c => c.ID !== id);
                 renderUI(); endLoading();
                 Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error'); }
         }
 
         async function saveModuleToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID || dataObj.ID === '';
             if (isNew) dataObj.ID = 'MOD-' + Date.now();
-
             try {
                 const { error } = await supabaseClient.from('Modules').upsert(dataObj);
                 if (error) throw error;
-
-                if (!isNew) { const idx = db.modules.findIndex(m => m.ID === dataObj.ID); db.modules[idx] = dataObj; } 
-                else { db.modules.push(dataObj); }
-                
+                if (!isNew) { const idx = db.modules.findIndex(m => m.ID === dataObj.ID); db.modules[idx] = dataObj; } else { db.modules.push(dataObj); }
                 closeModal(); renderAdminModuleTable(); endLoading();
                 Swal.fire({ title: 'Tersimpan!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Menyimpan', e.message, 'error'); }
         }
 
         async function deleteModuleFromSupabase(id) {
@@ -536,21 +638,34 @@
             try {
                 const { error } = await supabaseClient.from('Modules').delete().eq('ID', id);
                 if (error) throw error;
-
                 db.modules = db.modules.filter(m => m.ID !== id);
                 renderAdminModuleTable(); endLoading();
                 Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error'); }
         }
 
+        // =========================================================================
+        // CRUD USERS OLEH ADMIN (Modifikasi agar memanggil Auth jika perlu)
+        // =========================================================================
         async function saveUserToSupabase(dataObj) {
             startLoading();
             const isNew = !dataObj.ID;
-            if (isNew) dataObj.ID = 'USR-' + Date.now();
-
+            
             try {
+                if (isNew) {
+                    dataObj.ID = 'USR-' + Date.now();
+                    
+                    // Admin menambahkan user baru, kita coba daftarkan ke Auth Supabase juga
+                    const { error: authError } = await supabaseClient.auth.signUp({
+                        email: dataObj.Email,
+                        password: dataObj.Password,
+                    });
+                    
+                    // Kita abaikan jika error Auth karena bisa saja email sudah ada di auth bawaan tapi belum ada di tabel kustom kita.
+                    if(authError) console.warn("Peringatan Auth saat tambah manual:", authError.message);
+                }
+
+                // Update / Insert di tabel Users kustom
                 const { error } = await supabaseClient.from('Users').upsert(dataObj);
                 if (error) throw error;
 
@@ -569,59 +684,39 @@
             try {
                 const { error } = await supabaseClient.from('Users').delete().eq('ID', id);
                 if (error) throw error;
-
                 db.users = db.users.filter(u => u.ID !== id);
                 renderAdminUsersTable(); endLoading();
-                Swal.fire({title: 'Dihapus!', icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error');
-            }
+                Swal.fire({title: 'Dihapus!', text: "Dihapus dari tabel internal. (Akun Auth Supabase perlu dihapus manual via Dashboard jika perlu)", icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
+            } catch(e) { endLoading(); Swal.fire('Gagal Menghapus', e.message, 'error'); }
         }
 
         async function saveMultipleUsersToSupabase(newUsers) {
             startLoading();
             try {
-                // Generate ID untuk masing-masing user baru
-                newUsers.forEach(nu => {
-                    nu.ID = 'USR-' + Math.floor(Math.random() * 1000000) + Date.now().toString().slice(-4);
-                });
-
-                // Supabase bisa melakukan Insert banyak array (bulk) sekaligus
+                // Untuk Bulk Import, kita hanya masukkan ke tabel kustom agar tidak terkena Rate Limit API signUp Supabase
+                newUsers.forEach(nu => { nu.ID = 'USR-' + Math.floor(Math.random() * 1000000) + Date.now().toString().slice(-4); });
                 const { error } = await supabaseClient.from('Users').insert(newUsers);
                 if (error) throw error;
+                
+                // Mendaftarkan satu per satu ke Auth akan lama & rawan kena blokir, 
+                // disarankan user yang di import CSV login dengan fallback kustom terlebih dahulu (diatasi di fungsi login).
 
                 db.users.push(...newUsers);
-                
                 closeModal(); renderAdminUsersTable(); endLoading();
                 Swal.fire({ title: 'Import Selesai!', text: `${newUsers.length} data berhasil ditambahkan.`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4' });
-            } catch(e) {
-                endLoading(); Swal.fire('Gagal Import', e.message, 'error');
-            }
+            } catch(e) { endLoading(); Swal.fire('Gagal Import', e.message, 'error'); }
         }
 
 
         // =========================================================================
-        // KODE UTILITY DAN UI STANDAR (SAMA SEPERTI SEBELUMNYA)
+        // UI UTILITIES
         // =========================================================================
+        window.onload = () => { loadData(); };
 
-        window.onload = () => {
-            const savedSession = localStorage.getItem('digitallab_session');
-            if (savedSession) {
-                const session = JSON.parse(savedSession);
-                isLoggedIn = true;
-                currentUserRole = session.role;
-            }
-            loadData();
-        };
-
-        function escapeHtml(text) {
-            if (text == null) return '';
-            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
+        function escapeHtml(text) { if (text == null) return ''; return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
         function getSafeYouTubeEmbedUrl(url) {
-            if (!url) return null;
-            let videoId = null;
+            if (!url) return null; let videoId = null;
             try {
                 if (url.includes('youtube.com/watch')) { videoId = new URL(url).searchParams.get('v'); } 
                 else if (url.includes('youtu.be/')) { videoId = url.split('youtu.be/')[1].split('?')[0]; } 
@@ -635,79 +730,21 @@
             const mobMenuBtn = document.getElementById('mobile-menu-btn');
             
             if (!isLoggedIn) {
-                navMenus.classList.remove('md:flex');
-                navMenus.classList.add('hidden');
-                mobMenuBtn.classList.add('hidden');
+                navMenus.classList.remove('md:flex'); navMenus.classList.add('hidden'); mobMenuBtn.classList.add('hidden');
             } else {
-                navMenus.classList.remove('hidden');
-                navMenus.classList.add('md:flex');
-                mobMenuBtn.classList.remove('hidden');
+                navMenus.classList.remove('hidden'); navMenus.classList.add('md:flex'); mobMenuBtn.classList.remove('hidden');
+                const deskAdminBtn = document.getElementById('navAdminBtn'); const mobAdminBtn = document.getElementById('navMobileAdminBtn');
+                const navDivider = document.getElementById('navDivider'); const deskLogoutBtn = document.getElementById('navLogoutBtn');
+                const mobLogoutBtn = document.getElementById('navMobileLogoutBtn'); const navMobDivider = document.getElementById('navMobileDivider');
                 
-                const deskAdminBtn = document.getElementById('navAdminBtn');
-                const mobAdminBtn = document.getElementById('navMobileAdminBtn');
-                const navDivider = document.getElementById('navDivider');
-                const deskLogoutBtn = document.getElementById('navLogoutBtn');
-                const mobLogoutBtn = document.getElementById('navMobileLogoutBtn');
-                const navMobDivider = document.getElementById('navMobileDivider');
-                
-                deskLogoutBtn.classList.remove('hidden');
-                mobLogoutBtn.classList.remove('hidden');
-                navDivider.classList.remove('hidden');
-                if(navMobDivider) navMobDivider.classList.remove('hidden');
+                deskLogoutBtn.classList.remove('hidden'); mobLogoutBtn.classList.remove('hidden'); navDivider.classList.remove('hidden'); if(navMobDivider) navMobDivider.classList.remove('hidden');
 
-                if (currentUserRole === 'admin') {
-                    deskAdminBtn.classList.remove('hidden'); 
-                    mobAdminBtn.classList.remove('hidden');
-                } else {
-                    deskAdminBtn.classList.add('hidden'); 
-                    mobAdminBtn.classList.add('hidden');
-                    if (!document.getElementById('view-admin').classList.contains('hidden') || 
-                        !document.getElementById('view-admin-modules').classList.contains('hidden') ||
-                        !document.getElementById('view-admin-users').classList.contains('hidden')) {
-                        navigate('home');
-                    }
+                if (currentUserRole === 'admin') { deskAdminBtn.classList.remove('hidden'); mobAdminBtn.classList.remove('hidden'); } 
+                else {
+                    deskAdminBtn.classList.add('hidden'); mobAdminBtn.classList.add('hidden');
+                    if (!document.getElementById('view-admin').classList.contains('hidden') || !document.getElementById('view-admin-modules').classList.contains('hidden') || !document.getElementById('view-admin-users').classList.contains('hidden')) { navigate('home'); }
                 }
             }
-        }
-
-        function handleLoginSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            
-            let user = null;
-            if (db.users && db.users.length > 0) {
-                user = db.users.find(u => u.Email === email && u.Password === pass);
-            }
-            
-            if (!user) {
-                if (email === 'admin@gmail.com' && pass === 'admin123') { user = { Role: 'admin', Name: 'Administrator', Email: email }; } 
-                else if (email === 'siswa@gmail.com' && pass === 'siswa123') { user = { Role: 'student', Name: 'Siswa / Member', Email: email }; }
-            }
-
-            if (user) {
-                isLoggedIn = true;
-                currentUserRole = user.Role;
-                localStorage.setItem('digitallab_session', JSON.stringify({ role: user.Role, email: user.Email }));
-                
-                checkAuth(); navigate('home');
-                Swal.fire({title: 'Login Berhasil!', text: `Selamat datang, ${user.Name}!`, icon: 'success', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4', timer: 1500, showConfirmButton: false});
-                document.getElementById('loginForm').reset();
-            } else {
-                Swal.fire({title: 'Akses Ditolak!', text: 'Email atau Kata Sandi salah.', icon: 'error', background: '#1a1635', color: '#fff', confirmButtonColor: '#06b6d4'});
-            }
-        }
-
-        function doLogout() {
-            Swal.fire({
-                title: 'Konfirmasi Keluar', text: 'Sesi anda akan diakhiri.', icon: 'question', background: '#1a1635', color: '#fff',
-                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Logout', cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    isLoggedIn = false; currentUserRole = 'guest'; localStorage.removeItem('digitallab_session');
-                    checkAuth(); navigate('login');
-                }
-            });
         }
 
         function startLoading() { document.getElementById('loadingOverlay').classList.remove('hidden', 'opacity-0'); }
@@ -722,19 +759,12 @@
             document.getElementById('hero-title').innerHTML = getVal('heroTitle', 'Kuasai AI & Iklan.<br>Skalakan Bisnis Anda.');
             document.getElementById('hero-desc').innerText = getVal('heroDesc', 'Pusat sumber daya digital eksklusif. Pelajari strategi periklanan modern.');
             
-            const commLink = getVal('communityLink', '#'); 
-            const btnComm = document.getElementById('btn-community');
-            if(commLink && commLink !== '#' && commLink.trim() !== '') {
-                btnComm.classList.remove('hidden'); btnComm.setAttribute('onclick', `window.open('${commLink}', '_blank')`);
-            } else { btnComm.classList.add('hidden'); }
+            const commLink = getVal('communityLink', '#'); const btnComm = document.getElementById('btn-community');
+            if(commLink && commLink !== '#' && commLink.trim() !== '') { btnComm.classList.remove('hidden'); btnComm.setAttribute('onclick', `window.open('${commLink}', '_blank')`); } else { btnComm.classList.add('hidden'); }
 
-            const appFont = getVal('appFont', 'Inter');
-            document.body.style.fontFamily = `"${appFont}", sans-serif`;
+            const appFont = getVal('appFont', 'Inter'); document.body.style.fontFamily = `"${appFont}", sans-serif`;
             if (appFont !== 'Inter' && !document.getElementById(`font-${appFont}`)) {
-                const link = document.createElement('link');
-                link.id = `font-${appFont}`;
-                link.href = `https://fonts.googleapis.com/css2?family=${appFont.replace(' ', '+')}:wght@300;400;600;800&display=swap`;
-                link.rel = 'stylesheet'; document.head.appendChild(link);
+                const link = document.createElement('link'); link.id = `font-${appFont}`; link.href = `https://fonts.googleapis.com/css2?family=${appFont.replace(' ', '+')}:wght@300;400;600;800&display=swap`; link.rel = 'stylesheet'; document.head.appendChild(link);
             }
         }
 
@@ -755,96 +785,56 @@
         function toggleMobileMenu() { const menu = document.getElementById('mobileMenu'); menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
 
         function filterCourses() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.course-card');
-            cards.forEach(card => {
-                const title = card.getAttribute('data-title').toLowerCase();
-                const desc = card.getAttribute('data-desc').toLowerCase();
-                if (title.includes(query) || desc.includes(query)) { card.style.display = 'flex'; } else { card.style.display = 'none'; }
-            });
+            const query = document.getElementById('searchInput').value.toLowerCase(); const cards = document.querySelectorAll('.course-card');
+            cards.forEach(card => { const title = card.getAttribute('data-title').toLowerCase(); const desc = card.getAttribute('data-desc').toLowerCase(); if (title.includes(query) || desc.includes(query)) { card.style.display = 'flex'; } else { card.style.display = 'none'; } });
         }
 
         function renderCourses() {
             const grid = document.getElementById('courseGrid'); let htmlStr = '';
             db.courses.forEach(course => {
-                htmlStr += `
-                    <div onclick="navigate('course', '${course.ID}')" data-title="${escapeHtml(course.Title)}" data-desc="${escapeHtml(course.Description)}" class="course-card glass glass-hover p-6 rounded-3xl cursor-pointer group flex flex-col h-full">
-                        <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl mb-4 group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all shadow-md shadow-black/20">
-                            <i class="bi ${course.Icon}"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-2">${escapeHtml(course.Title)}</h3>
-                        <p class="text-white/60 text-base flex-grow">${escapeHtml(course.Description)}</p>
-                        <div class="mt-6 pt-4 border-t border-white/10 text-sm font-semibold tracking-wider text-white/40 group-hover:text-white/80 flex justify-between items-center transition-all">
-                            LIHAT DETAIL <i class="bi bi-arrow-right"></i>
-                        </div>
-                    </div>`;
-            });
-            grid.innerHTML = htmlStr;
+                htmlStr += `<div onclick="navigate('course', '${course.ID}')" data-title="${escapeHtml(course.Title)}" data-desc="${escapeHtml(course.Description)}" class="course-card glass glass-hover p-6 rounded-3xl cursor-pointer group flex flex-col h-full"><div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl mb-4 group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all shadow-md shadow-black/20"><i class="bi ${course.Icon}"></i></div><h3 class="text-2xl font-bold mb-2">${escapeHtml(course.Title)}</h3><p class="text-white/60 text-base flex-grow">${escapeHtml(course.Description)}</p><div class="mt-6 pt-4 border-t border-white/10 text-sm font-semibold tracking-wider text-white/40 group-hover:text-white/80 flex justify-between items-center transition-all">LIHAT DETAIL <i class="bi bi-arrow-right"></i></div></div>`;
+            }); grid.innerHTML = htmlStr;
         }
 
         function loadCourseDetail(courseId) {
-            currentCourseId = courseId;
-            const course = db.courses.find(c => c.ID === courseId);
-            if(!course) return;
-            document.getElementById('detail-title').innerText = course.Title; document.getElementById('detail-desc').innerText = course.Description; document.getElementById('detail-icon').innerHTML = `<i class="bi ${course.Icon}"></i>`;
-            switchTab('video');
+            currentCourseId = courseId; const course = db.courses.find(c => c.ID === courseId); if(!course) return;
+            document.getElementById('detail-title').innerText = course.Title; document.getElementById('detail-desc').innerText = course.Description; document.getElementById('detail-icon').innerHTML = `<i class="bi ${course.Icon}"></i>`; switchTab('video');
         }
 
         function switchTab(tabName) {
             document.querySelectorAll('.detail-tab-btn').forEach(btn => { btn.classList.remove('glass-active'); btn.classList.add('hover:bg-white/10'); });
             document.getElementById(`tab-${tabName}`).classList.add('glass-active'); document.getElementById(`tab-${tabName}`).classList.remove('hover:bg-white/10');
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById(`content-${tabName}`).classList.remove('hidden');
-            renderTabContent(tabName);
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById(`content-${tabName}`).classList.remove('hidden'); renderTabContent(tabName);
         }
 
         function renderTabContent(tabName) {
-            const modules = db.modules.filter(m => m.CourseID === currentCourseId && m.TabType === tabName);
-            let htmlStr = '';
-            
+            const modules = db.modules.filter(m => m.CourseID === currentCourseId && m.TabType === tabName); let htmlStr = '';
             if (tabName === 'video') {
-                const list = document.getElementById('videoList');
-                if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada video materi.</p>';
+                const list = document.getElementById('videoList'); if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada video materi.</p>';
                 modules.forEach((mod, idx) => {
-                    let embedUrl = getSafeYouTubeEmbedUrl(mod.Link);
-                    let mediaContent = '';
+                    let embedUrl = getSafeYouTubeEmbedUrl(mod.Link); let mediaContent = '';
                     if (embedUrl) { mediaContent = `<div class="w-full aspect-video rounded-xl overflow-hidden mb-6 border border-white/10 bg-black/50 shadow-lg"><iframe class="w-full h-full" src="${embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`; } 
                     else if (mod.Link) { mediaContent = `<a href="${escapeHtml(mod.Link)}" target="_blank" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-semibold transition-all inline-flex items-center mb-6"><i class="bi bi-box-arrow-up-right mr-2"></i> Buka Materi Eksternal</a><br>`; }
-                    htmlStr += `
-                        <div class="glass rounded-2xl overflow-hidden mb-3">
-                            <button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/5 transition-all" onclick="toggleAccordion('acc-${idx}')">
-                                <span class="font-semibold flex items-center text-lg"><i class="bi bi-play-circle-fill text-cyan-400 mr-3 text-2xl drop-shadow-md"></i> ${escapeHtml(mod.Title)}</span>
-                                <i class="bi bi-chevron-down text-white/50 transition-transform duration-300" id="icon-acc-${idx}"></i>
-                            </button>
-                            <div id="acc-${idx}" class="accordion-content bg-black/20">
-                                <div class="p-6 text-white/70 text-base border-t border-white/5">${mediaContent}<p class="leading-relaxed">${escapeHtml(mod.Content)}</p></div>
-                            </div>
-                        </div>`;
-                });
-                list.innerHTML = htmlStr;
+                    htmlStr += `<div class="glass rounded-2xl overflow-hidden mb-3"><button class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-white/5 transition-all" onclick="toggleAccordion('acc-${idx}')"><span class="font-semibold flex items-center text-lg"><i class="bi bi-play-circle-fill text-cyan-400 mr-3 text-2xl drop-shadow-md"></i> ${escapeHtml(mod.Title)}</span><i class="bi bi-chevron-down text-white/50 transition-transform duration-300" id="icon-acc-${idx}"></i></button><div id="acc-${idx}" class="accordion-content bg-black/20"><div class="p-6 text-white/70 text-base border-t border-white/5">${mediaContent}<p class="leading-relaxed">${escapeHtml(mod.Content)}</p></div></div></div>`;
+                }); list.innerHTML = htmlStr;
             } else if (tabName === 'tools') {
-                const list = document.getElementById('toolsList');
-                if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada alat bantu.</p>';
+                const list = document.getElementById('toolsList'); if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada alat bantu.</p>';
                 modules.forEach(mod => {
                     let btnAction = mod.Link ? `<a href="${escapeHtml(mod.Link)}" target="_blank" class="text-sm bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-4 py-2 rounded-lg hover:bg-cyan-500/20 transition-all inline-block">Buka Akses</a>` : `<button onclick="simulateToolAccess('${escapeHtml(mod.Title)}')" class="text-sm bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-4 py-2 rounded-lg hover:bg-cyan-500/20 transition-all">Akses Alat</button>`;
                     htmlStr += `<div class="glass glass-hover p-5 rounded-2xl flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center shrink-0 text-xl"><i class="bi bi-wrench"></i></div><div><h4 class="font-bold mb-2 text-lg">${escapeHtml(mod.Title)}</h4><p class="text-sm text-white/60 mb-4 leading-relaxed">${escapeHtml(mod.Content)}</p>${btnAction}</div></div>`;
-                });
-                list.innerHTML = htmlStr;
+                }); list.innerHTML = htmlStr;
             } else if (tabName === 'docs') {
-                const list = document.getElementById('docsList');
-                if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada dokumen.</p>';
+                const list = document.getElementById('docsList'); if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada dokumen.</p>';
                 modules.forEach(mod => {
                     let btnAction = mod.Link ? `<a href="${escapeHtml(mod.Link)}" target="_blank" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all inline-flex items-center justify-center text-white"><i class="bi bi-download"></i></a>` : `<button onclick="simulateToolAccess('Download ${escapeHtml(mod.Title)}')" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center"><i class="bi bi-download"></i></button>`;
                     htmlStr += `<div class="glass p-5 rounded-2xl flex justify-between items-center hover:bg-white/5 transition-all"><div class="flex items-center gap-4"><i class="bi bi-file-earmark-pdf-fill text-yellow-400 text-3xl"></i><span class="font-medium text-lg">${escapeHtml(mod.Title)}</span></div>${btnAction}</div>`;
-                });
-                list.innerHTML = htmlStr;
+                }); list.innerHTML = htmlStr;
             } else if (tabName === 'bonus') {
-                const list = document.getElementById('bonusList');
-                if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada materi bonus.</p>';
+                const list = document.getElementById('bonusList'); if(modules.length === 0) htmlStr = '<p class="text-white/50 text-base">Belum ada materi bonus.</p>';
                 modules.forEach(mod => {
                     let btnAction = mod.Link ? `<a href="${escapeHtml(mod.Link)}" target="_blank" class="text-sm bg-green-500/10 px-4 py-2 rounded-lg hover:bg-green-500/20 border border-green-500/30 transition-all inline-block text-green-300">Klaim Bonus</a>` : `<button onclick="simulateToolAccess('Bonus ${escapeHtml(mod.Title)}')" class="text-sm bg-green-500/10 px-4 py-2 rounded-lg hover:bg-green-500/20 border border-green-500/30 transition-all text-green-300">Klaim Bonus</button>`;
                     htmlStr += `<div class="glass glass-hover p-5 rounded-2xl flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-green-500/20 text-green-300 flex items-center justify-center shrink-0 text-xl"><i class="bi bi-gift-fill"></i></div><div><h4 class="font-bold mb-2 text-lg">${escapeHtml(mod.Title)}</h4><p class="text-sm text-white/60 mb-4 leading-relaxed">${escapeHtml(mod.Content)}</p>${btnAction}</div></div>`;
-                });
-                list.innerHTML = htmlStr;
+                }); list.innerHTML = htmlStr;
             }
         }
 
@@ -857,282 +847,116 @@
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody'); let htmlStr = '';
             db.courses.forEach(c => {
-                htmlStr += `
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
-                        <td class="p-5 text-sm text-white/50">${c.ID}</td>
-                        <td class="p-5"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-cyan-300"><i class="bi ${c.Icon} text-lg"></i></div></td>
-                        <td class="p-5 font-bold">${escapeHtml(c.Title)}</td>
-                        <td class="p-5 text-sm text-white/60 truncate max-w-xs">${escapeHtml(c.Description)}</td>
-                        <td class="p-5 text-right">
-                            <button onclick="manageModules('${c.ID}')" class="text-blue-400 hover:text-white hover:bg-blue-500 mr-2 px-3 py-1.5 rounded-lg bg-blue-400/10 transition-all font-medium text-sm"><i class="bi bi-collection-play mr-1"></i> Materi</button>
-                            <button onclick="editCourse('${c.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button>
-                            <button onclick="deleteCourse('${c.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tbody.innerHTML = htmlStr;
+                htmlStr += `<tr class="border-b border-white/5 hover:bg-white/5 transition-all"><td class="p-5 text-sm text-white/50">${c.ID}</td><td class="p-5"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-cyan-300"><i class="bi ${c.Icon} text-lg"></i></div></td><td class="p-5 font-bold">${escapeHtml(c.Title)}</td><td class="p-5 text-sm text-white/60 truncate max-w-xs">${escapeHtml(c.Description)}</td><td class="p-5 text-right"><button onclick="manageModules('${c.ID}')" class="text-blue-400 hover:text-white hover:bg-blue-500 mr-2 px-3 py-1.5 rounded-lg bg-blue-400/10 transition-all font-medium text-sm"><i class="bi bi-collection-play mr-1"></i> Materi</button><button onclick="editCourse('${c.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button><button onclick="deleteCourse('${c.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button></td></tr>`;
+            }); tbody.innerHTML = htmlStr;
         }
 
         function openConfigModal() {
             const getVal = (key, def) => { const item = db.config.find(c => c.Key === key); return item && item.Value ? item.Value : def; };
             const title = getVal('heroTitle', 'Kuasai AI & Iklan.<br>Skalakan Bisnis Anda.'); const desc = getVal('heroDesc', 'Pusat sumber daya digital eksklusif.'); const link = getVal('communityLink', ''); const font = getVal('appFont', 'Inter');
-
-            document.getElementById('modalContent').innerHTML = `
-                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                    <h3 class="text-2xl font-bold">Pengaturan Umum Web</h3>
-                    <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex items-center justify-center transition-all"><i class="bi bi-x-lg"></i></button>
-                </div>
-                <form id="configForm">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div>
-                    <button type="button" onclick="saveConfig(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> Simpan Semua Pengaturan</button>
-                </form>
-            `;
+            document.getElementById('modalContent').innerHTML = `<div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">Pengaturan Umum Web</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex items-center justify-center transition-all"><i class="bi bi-x-lg"></i></button></div><form id="configForm"><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Utama (Beranda)</label><input type="text" id="confTitle" value="${escapeHtml(title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Beranda</label><textarea id="confDesc" rows="2" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(desc)}</textarea></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Link Komunitas (Telegram/WA)</label><input type="text" id="confLink" value="${escapeHtml(link)}" placeholder="https://..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div><div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Font Aplikasi (Gaya Tulisan)</label><select id="confFont" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"><option value="Inter" ${font === 'Inter' ? 'selected' : ''} class="bg-[#1a1635]">Inter (Bawaan)</option><option value="Poppins" ${font === 'Poppins' ? 'selected' : ''} class="bg-[#1a1635]">Poppins (Modern)</option><option value="Montserrat" ${font === 'Montserrat' ? 'selected' : ''} class="bg-[#1a1635]">Montserrat (Tegas)</option><option value="Roboto" ${font === 'Roboto' ? 'selected' : ''} class="bg-[#1a1635]">Roboto (Klasik)</option></select></div><button type="button" onclick="saveConfig(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> Simpan Semua Pengaturan</button></form>`;
             showModal();
         }
 
         function saveConfig(e) {
             if(e) e.preventDefault();
-            const configsToSave = [
-                { Key: 'heroTitle', Value: document.getElementById('confTitle').value },
-                { Key: 'heroDesc', Value: document.getElementById('confDesc').value },
-                { Key: 'communityLink', Value: document.getElementById('confLink').value },
-                { Key: 'appFont', Value: document.getElementById('confFont').value }
-            ];
+            const configsToSave = [ { Key: 'heroTitle', Value: document.getElementById('confTitle').value }, { Key: 'heroDesc', Value: document.getElementById('confDesc').value }, { Key: 'communityLink', Value: document.getElementById('confLink').value }, { Key: 'appFont', Value: document.getElementById('confFont').value } ];
             saveConfigToSupabase(configsToSave);
         }
 
         function openAdminModal(courseId = null) {
-            let course = { ID: '', Title: '', Description: '', Icon: 'bi-box' };
-            if (courseId) course = db.courses.find(c => c.ID === courseId);
-            document.getElementById('modalContent').innerHTML = `
-                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                    <h3 class="text-2xl font-bold">${courseId ? 'Edit Kategori Modul' : 'Tambah Kategori Modul'}</h3>
-                    <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 w-8 h-8 flex items-center justify-center rounded-full"><i class="bi bi-x-lg"></i></button>
-                </div>
-                <form id="courseForm">
-                    <input type="hidden" id="formId" value="${escapeHtml(course.ID)}">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Kategori</label><input type="text" id="formTitle" value="${escapeHtml(course.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat</label><textarea id="formDesc" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(course.Description)}</textarea></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Class Icon (Bootstrap Icons)</label><input type="text" id="formIcon" value="${escapeHtml(course.Icon)}" placeholder="bi-robot" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div>
-                    <button type="button" onclick="saveCourse(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> ${courseId ? 'Update Data' : 'Simpan Kategori Baru'}</button>
-                </form>
-            `;
+            let course = { ID: '', Title: '', Description: '', Icon: 'bi-box' }; if (courseId) course = db.courses.find(c => c.ID === courseId);
+            document.getElementById('modalContent').innerHTML = `<div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">${courseId ? 'Edit Kategori Modul' : 'Tambah Kategori Modul'}</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 w-8 h-8 flex items-center justify-center rounded-full"><i class="bi bi-x-lg"></i></button></div><form id="courseForm"><input type="hidden" id="formId" value="${escapeHtml(course.ID)}"><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Kategori</label><input type="text" id="formTitle" value="${escapeHtml(course.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat</label><textarea id="formDesc" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner">${escapeHtml(course.Description)}</textarea></div><div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Class Icon (Bootstrap Icons)</label><input type="text" id="formIcon" value="${escapeHtml(course.Icon)}" placeholder="bi-robot" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:bg-white/5 transition-all shadow-inner"></div><button type="button" onclick="saveCourse(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> ${courseId ? 'Update Data' : 'Simpan Kategori Baru'}</button></form>`;
             showModal();
         }
 
         function saveCourse(e) {
-            if(e) e.preventDefault();
-            const title = document.getElementById('formTitle').value;
-            if(!title || title.trim() === '') { Swal.fire('Oops!', 'Judul kategori wajib diisi!', 'warning'); return; }
-            
-            const dataObj = {
-                ID: document.getElementById('formId').value, Title: title,
-                Description: document.getElementById('formDesc').value, Icon: document.getElementById('formIcon').value || 'bi-box'
-            };
-            saveCourseToSupabase(dataObj);
+            if(e) e.preventDefault(); const title = document.getElementById('formTitle').value; if(!title || title.trim() === '') { Swal.fire('Oops!', 'Judul kategori wajib diisi!', 'warning'); return; }
+            saveCourseToSupabase({ ID: document.getElementById('formId').value, Title: title, Description: document.getElementById('formDesc').value, Icon: document.getElementById('formIcon').value || 'bi-box' });
         }
 
         function editCourse(id) { openAdminModal(id); }
         function deleteCourse(id) {
-            Swal.fire({ title: 'Hapus Kategori?', text: 'Materi di dalamnya tetap ada di DB namun tidak akan tampil.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
-            .then((result) => {
-                if (result.isConfirmed) { deleteCourseFromSupabase(id); }
-            });
+            Swal.fire({ title: 'Hapus Kategori?', text: 'Materi di dalamnya tetap ada di DB namun tidak akan tampil.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' }).then((result) => { if (result.isConfirmed) { deleteCourseFromSupabase(id); } });
         }
 
-        function manageModules(courseId) {
-            currentAdminCourseId = courseId;
-            const course = db.courses.find(c => c.ID === courseId);
-            document.getElementById('admin-module-title').innerText = `Materi: ${course.Title}`;
-            renderAdminModuleTable(); navigate('admin-modules');
-        }
+        function manageModules(courseId) { currentAdminCourseId = courseId; const course = db.courses.find(c => c.ID === courseId); document.getElementById('admin-module-title').innerText = `Materi: ${course.Title}`; renderAdminModuleTable(); navigate('admin-modules'); }
 
         function renderAdminModuleTable() {
-            const tbody = document.getElementById('adminModuleTableBody'); let htmlStr = '';
-            const modules = db.modules.filter(m => m.CourseID === currentAdminCourseId);
-            
+            const tbody = document.getElementById('adminModuleTableBody'); let htmlStr = ''; const modules = db.modules.filter(m => m.CourseID === currentAdminCourseId);
             if(modules.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-white/50 bg-white/5 rounded-b-xl border-t border-white/5">Belum ada materi untuk kategori ini.</td></tr>`; return; }
-
             modules.forEach(m => {
-                let typeBadge = m.TabType === 'video' ? '<span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-play-circle mr-1"></i> Video</span>' : 
-                               (m.TabType === 'tools' ? '<span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-tools mr-1"></i> Tools</span>' : 
-                               (m.TabType === 'docs' ? '<span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-journal mr-1"></i> E-Book</span>' : 
-                               '<span class="bg-green-500/20 text-green-300 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-gift mr-1"></i> Bonus</span>'));
-                htmlStr += `
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
-                        <td class="p-5">${typeBadge}</td>
-                        <td class="p-5 font-bold">${escapeHtml(m.Title)}</td>
-                        <td class="p-5 text-sm text-white/60 truncate max-w-xs">${escapeHtml(m.Content)} ${m.Link ? `<br><span class="text-cyan-400 text-xs mt-1 font-semibold inline-block"><i class="bi bi-link-45deg"></i> Link Tersemat</span>` : ''}</td>
-                        <td class="p-5 text-right">
-                            <button onclick="editModule('${m.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button>
-                            <button onclick="deleteModule('${m.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tbody.innerHTML = htmlStr;
+                let typeBadge = m.TabType === 'video' ? '<span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-play-circle mr-1"></i> Video</span>' : (m.TabType === 'tools' ? '<span class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-tools mr-1"></i> Tools</span>' : (m.TabType === 'docs' ? '<span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-journal mr-1"></i> E-Book</span>' : '<span class="bg-green-500/20 text-green-300 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold"><i class="bi bi-gift mr-1"></i> Bonus</span>'));
+                htmlStr += `<tr class="border-b border-white/5 hover:bg-white/5 transition-all"><td class="p-5">${typeBadge}</td><td class="p-5 font-bold">${escapeHtml(m.Title)}</td><td class="p-5 text-sm text-white/60 truncate max-w-xs">${escapeHtml(m.Content)} ${m.Link ? `<br><span class="text-cyan-400 text-xs mt-1 font-semibold inline-block"><i class="bi bi-link-45deg"></i> Link Tersemat</span>` : ''}</td><td class="p-5 text-right"><button onclick="editModule('${m.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button><button onclick="deleteModule('${m.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button></td></tr>`;
+            }); tbody.innerHTML = htmlStr;
         }
 
         function openModuleModal(moduleId = null) {
-            let mod = { ID: '', CourseID: currentAdminCourseId, TabType: 'video', Title: '', Content: '', Link: '' };
-            if (moduleId) mod = db.modules.find(m => m.ID === moduleId) || mod;
-            document.getElementById('modalContent').innerHTML = `
-                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                    <h3 class="text-2xl font-bold">${moduleId ? 'Edit Materi' : 'Tambah Materi Baru'}</h3>
-                    <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button>
-                </div>
-                <form id="moduleForm">
-                    <input type="hidden" id="formModId" value="${escapeHtml(mod.ID)}">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Tipe Materi</label><select id="formModTab" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"><option value="video" ${mod.TabType === 'video' ? 'selected' : ''} class="bg-[#1a1635]">🎥 Video Materi (YouTube URL)</option><option value="tools" ${mod.TabType === 'tools' ? 'selected' : ''} class="bg-[#1a1635]">🛠️ Akses Tools (Link Web)</option><option value="docs" ${mod.TabType === 'docs' ? 'selected' : ''} class="bg-[#1a1635]">📖 E-Book / Dokumen (Drive Link)</option><option value="bonus" ${mod.TabType === 'bonus' ? 'selected' : ''} class="bg-[#1a1635]">🎁 Bonus Spesial</option></select></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Materi / Modul</label><input type="text" id="formModTitle" value="${escapeHtml(mod.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat atau Catatan</label><textarea id="formModContent" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner">${escapeHtml(mod.Content)}</textarea></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Link / URL <span class="text-white/40 font-normal">(Untuk Video Embed atau Tautan Akses)</span></label><input type="text" id="formModLink" value="${escapeHtml(mod.Link)}" placeholder="Misal: https://youtu.be/..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"></div>
-                    <button type="button" onclick="saveModule(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> ${moduleId ? 'Update Materi' : 'Simpan Materi'}</button>
-                </form>
-            `;
+            let mod = { ID: '', CourseID: currentAdminCourseId, TabType: 'video', Title: '', Content: '', Link: '' }; if (moduleId) mod = db.modules.find(m => m.ID === moduleId) || mod;
+            document.getElementById('modalContent').innerHTML = `<div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">${moduleId ? 'Edit Materi' : 'Tambah Materi Baru'}</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button></div><form id="moduleForm"><input type="hidden" id="formModId" value="${escapeHtml(mod.ID)}"><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Tipe Materi</label><select id="formModTab" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"><option value="video" ${mod.TabType === 'video' ? 'selected' : ''} class="bg-[#1a1635]">🎥 Video Materi (YouTube URL)</option><option value="tools" ${mod.TabType === 'tools' ? 'selected' : ''} class="bg-[#1a1635]">🛠️ Akses Tools (Link Web)</option><option value="docs" ${mod.TabType === 'docs' ? 'selected' : ''} class="bg-[#1a1635]">📖 E-Book / Dokumen (Drive Link)</option><option value="bonus" ${mod.TabType === 'bonus' ? 'selected' : ''} class="bg-[#1a1635]">🎁 Bonus Spesial</option></select></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Judul Materi / Modul</label><input type="text" id="formModTitle" value="${escapeHtml(mod.Title)}" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Deskripsi Singkat atau Catatan</label><textarea id="formModContent" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner">${escapeHtml(mod.Content)}</textarea></div><div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Link / URL <span class="text-white/40 font-normal">(Untuk Video Embed atau Tautan Akses)</span></label><input type="text" id="formModLink" value="${escapeHtml(mod.Link)}" placeholder="Misal: https://youtu.be/..." class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 transition-all shadow-inner"></div><button type="button" onclick="saveModule(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-cyan-600/20 text-cyan-300 border border-cyan-500/50 flex justify-center items-center transition-all shadow-lg shadow-cyan-500/20"><i class="bi bi-save mr-2"></i> ${moduleId ? 'Update Materi' : 'Simpan Materi'}</button></form>`;
             showModal();
         }
 
         function saveModule(e) {
-            if(e) e.preventDefault();
-            const title = document.getElementById('formModTitle').value;
-            if(!title || title.trim() === '') { Swal.fire('Oops', 'Judul materi wajib diisi!', 'warning'); return; }
-
-            const dataObj = {
-                ID: document.getElementById('formModId').value, CourseID: currentAdminCourseId,
-                TabType: document.getElementById('formModTab').value, Title: title,
-                Content: document.getElementById('formModContent').value, Link: document.getElementById('formModLink').value
-            };
-            saveModuleToSupabase(dataObj);
+            if(e) e.preventDefault(); const title = document.getElementById('formModTitle').value; if(!title || title.trim() === '') { Swal.fire('Oops', 'Judul materi wajib diisi!', 'warning'); return; }
+            saveModuleToSupabase({ ID: document.getElementById('formModId').value, CourseID: currentAdminCourseId, TabType: document.getElementById('formModTab').value, Title: title, Content: document.getElementById('formModContent').value, Link: document.getElementById('formModLink').value });
         }
 
         function editModule(id) { openModuleModal(id); }
-        function deleteModule(id) {
-            Swal.fire({ title: 'Hapus Materi ini?', text: 'Data tidak dapat dikembalikan!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
-            .then((result) => {
-                if (result.isConfirmed) { deleteModuleFromSupabase(id); }
-            });
-        }
+        function deleteModule(id) { Swal.fire({ title: 'Hapus Materi ini?', text: 'Data tidak dapat dikembalikan!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' }).then((result) => { if (result.isConfirmed) { deleteModuleFromSupabase(id); } }); }
 
         function showModal() { const modal = document.getElementById('glassModal'); modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modalContent').classList.remove('scale-95'); }, 10); }
         function closeModal() { const modal = document.getElementById('glassModal'); modal.classList.add('opacity-0'); document.getElementById('modalContent').classList.add('scale-95'); setTimeout(() => modal.classList.add('hidden'), 300); }
-        function simulateToolAccess(toolName) {
-            document.getElementById('modalContent').innerHTML = `
-                <div class="text-center pb-4"><div class="w-20 h-20 bg-cyan-500/10 text-cyan-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl border border-cyan-500/20 shadow-lg"><i class="bi bi-cpu"></i></div><h3 class="text-2xl font-bold mb-2">Akses ${toolName}</h3><p class="text-white/60 text-sm mb-8 leading-relaxed">Materi ini tidak memiliki Tautan/Link tujuan.<br>Mohon tambahkan Link terlebih dahulu melalui menu Edit Materi di Admin Panel.</p></div>
-                <button onclick="closeModal()" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition-all">Tutup Jendela Ini</button>
-            `;
-            showModal();
-        }
+        function simulateToolAccess(toolName) { document.getElementById('modalContent').innerHTML = `<div class="text-center pb-4"><div class="w-20 h-20 bg-cyan-500/10 text-cyan-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl border border-cyan-500/20 shadow-lg"><i class="bi bi-cpu"></i></div><h3 class="text-2xl font-bold mb-2">Akses ${toolName}</h3><p class="text-white/60 text-sm mb-8 leading-relaxed">Materi ini tidak memiliki Tautan/Link tujuan.<br>Mohon tambahkan Link terlebih dahulu melalui menu Edit Materi di Admin Panel.</p></div><button onclick="closeModal()" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition-all">Tutup Jendela Ini</button>`; showModal(); }
 
         function manageUsers() { renderAdminUsersTable(); navigate('admin-users'); }
 
         function renderAdminUsersTable() {
             const tbody = document.getElementById('adminUsersTableBody'); let htmlStr = '';
             if(db.users.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-white/50 bg-white/5 rounded-b-xl border-t border-white/5">Belum ada data pengguna.</td></tr>`; return; }
-
             db.users.forEach(u => {
                 let roleBadge = u.Role === 'admin' ? '<span class="bg-red-500/20 text-red-300 border border-red-500/30 px-3 py-1 rounded-full text-xs font-bold">Admin</span>' : '<span class="bg-green-500/20 text-green-300 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold">Siswa</span>';
-                htmlStr += `
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-all">
-                        <td class="p-5 font-bold">${escapeHtml(u.Name)}</td>
-                        <td class="p-5 text-sm text-white/80">${escapeHtml(u.Email)}</td>
-                        <td class="p-5 text-sm text-white/50 font-mono">${escapeHtml(u.Password)}</td>
-                        <td class="p-5">${roleBadge}</td>
-                        <td class="p-5 text-right">
-                            <button onclick="editUser('${u.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button>
-                            <button onclick="deleteUser('${u.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-            tbody.innerHTML = htmlStr;
+                htmlStr += `<tr class="border-b border-white/5 hover:bg-white/5 transition-all"><td class="p-5 font-bold">${escapeHtml(u.Name)}</td><td class="p-5 text-sm text-white/80">${escapeHtml(u.Email)}</td><td class="p-5 text-sm text-white/50 font-mono">${escapeHtml(u.Password)}</td><td class="p-5">${roleBadge}</td><td class="p-5 text-right"><button onclick="editUser('${u.ID}')" class="text-cyan-400 hover:text-white hover:bg-cyan-500 mr-2 px-2 py-1.5 rounded-lg bg-cyan-400/10 transition-all"><i class="bi bi-pencil"></i></button><button onclick="deleteUser('${u.ID}')" class="text-red-400 hover:text-white hover:bg-red-500 px-2 py-1.5 rounded-lg bg-red-400/10 transition-all"><i class="bi bi-trash"></i></button></td></tr>`;
+            }); tbody.innerHTML = htmlStr;
         }
 
         function openUserModal(userId = null) {
-            let user = { ID: '', Name: '', Email: '', Password: '', Role: 'student' };
-            if (userId) user = db.users.find(u => u.ID === userId) || user;
-            document.getElementById('modalContent').innerHTML = `
-                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                    <h3 class="text-2xl font-bold">${userId ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h3>
-                    <button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button>
-                </div>
-                <form id="userForm">
-                    <input type="hidden" id="formUserId" value="${escapeHtml(user.ID)}">
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Nama Lengkap</label><input type="text" id="formUserName" value="${escapeHtml(user.Name)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Email Akses</label><input type="email" id="formUserEmail" value="${escapeHtml(user.Email)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div>
-                    <div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Password Akses</label><input type="text" id="formUserPass" value="${escapeHtml(user.Password)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div>
-                    <div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Hak Akses (Role)</label><select id="formUserRole" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"><option value="student" ${user.Role === 'student' ? 'selected' : ''} class="bg-[#1a1635]">Siswa / Member Biasa</option><option value="admin" ${user.Role === 'admin' ? 'selected' : ''} class="bg-[#1a1635]">Administrator</option></select></div>
-                    <button type="button" onclick="saveUser(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-green-600/20 text-green-300 border border-green-500/50 flex justify-center items-center transition-all shadow-lg shadow-green-500/20"><i class="bi bi-save mr-2"></i> ${userId ? 'Update Pengguna' : 'Simpan Pengguna'}</button>
-                </form>
-            `;
+            let user = { ID: '', Name: '', Email: '', Password: '', Role: 'student' }; if (userId) user = db.users.find(u => u.ID === userId) || user;
+            document.getElementById('modalContent').innerHTML = `<div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">${userId ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button></div><form id="userForm"><input type="hidden" id="formUserId" value="${escapeHtml(user.ID)}"><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Nama Lengkap</label><input type="text" id="formUserName" value="${escapeHtml(user.Name)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Email Akses</label><input type="email" id="formUserEmail" value="${escapeHtml(user.Email)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div><div class="mb-4"><label class="block text-sm text-white/70 mb-2 font-medium">Password Akses</label><input type="text" id="formUserPass" value="${escapeHtml(user.Password)}" required class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"></div><div class="mb-8"><label class="block text-sm text-white/70 mb-2 font-medium">Hak Akses (Role)</label><select id="formUserRole" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 transition-all shadow-inner"><option value="student" ${user.Role === 'student' ? 'selected' : ''} class="bg-[#1a1635]">Siswa / Member Biasa</option><option value="admin" ${user.Role === 'admin' ? 'selected' : ''} class="bg-[#1a1635]">Administrator</option></select></div><button type="button" onclick="saveUserLogic(event)" class="w-full glass glass-hover py-4 rounded-xl font-bold bg-green-600/20 text-green-300 border border-green-500/50 flex justify-center items-center transition-all shadow-lg shadow-green-500/20"><i class="bi bi-save mr-2"></i> ${userId ? 'Update Pengguna' : 'Simpan Pengguna'}</button></form>`;
             showModal();
         }
 
-        function saveUser(e) {
+        function saveUserLogic(e) {
             if(e) e.preventDefault();
             const name = document.getElementById('formUserName').value; const email = document.getElementById('formUserEmail').value; const pass = document.getElementById('formUserPass').value;
             if(!name || !email || !pass) { Swal.fire('Oops', 'Semua kolom wajib diisi!', 'warning'); return; }
-
-            const dataObj = { ID: document.getElementById('formUserId').value, Name: name, Email: email, Password: pass, Role: document.getElementById('formUserRole').value };
-            saveUserToSupabase(dataObj);
+            saveUserToSupabase({ ID: document.getElementById('formUserId').value, Name: name, Email: email, Password: pass, Role: document.getElementById('formUserRole').value });
         }
 
         function editUser(id) { openUserModal(id); }
-        function deleteUser(id) {
-            Swal.fire({ title: 'Hapus Pengguna ini?', text: 'Siswa tidak akan bisa login lagi.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' })
-            .then((result) => {
-                if (result.isConfirmed) { deleteUserFromSupabase(id); }
-            });
-        }
+        function deleteUser(id) { Swal.fire({ title: 'Hapus Pengguna ini?', text: 'Siswa tidak akan bisa login lagi via data ini.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!', background: '#1a1635', color: '#fff' }).then((result) => { if (result.isConfirmed) { deleteUserFromSupabase(id); } }); }
 
         function downloadCsvTemplate() {
-            const csvContent = "Name;Email;Password;Role\nSiswa Budi;budi@gmail.com;rahasia123;student\nAdmin Rini;rini@gmail.com;admin123;admin";
-            const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url); link.setAttribute("download", "template_pengguna.csv"); link.style.visibility = 'hidden';
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            const csvContent = "Name;Email;Password;Role\nSiswa Budi;budi@gmail.com;rahasia123;student\nAdmin Rini;rini@gmail.com;admin123;admin"; const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); const url = URL.createObjectURL(blob); link.setAttribute("href", url); link.setAttribute("download", "template_pengguna.csv"); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function openImportCsvModal() {
-            document.getElementById('modalContent').innerHTML = `
-                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">Import CSV Pengguna</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button></div>
-                <div class="mb-4"><p class="text-white/60 text-sm mb-4 leading-relaxed">Pilih file CSV yang sudah diisi sesuai template.<br>Format Header: <b>Name, Email, Password, Role</b> (Gunakan pemisah koma atau titik koma).</p><input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-white/70 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-300 hover:file:bg-blue-500/30 transition-all cursor-pointer"></div>
-                <button type="button" onclick="processCsvImport()" class="w-full mt-6 glass glass-hover py-4 rounded-xl font-bold bg-blue-600/20 text-blue-300 border border-blue-500/50 flex justify-center items-center transition-all shadow-lg shadow-blue-500/20"><i class="bi bi-upload mr-2"></i> Mulai Import Data</button>
-            `;
-            showModal();
+            document.getElementById('modalContent').innerHTML = `<div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4"><h3 class="text-2xl font-bold">Import CSV Pengguna</h3><button onclick="closeModal()" class="text-white/50 hover:text-white bg-white/5 rounded-full w-8 h-8 flex justify-center items-center"><i class="bi bi-x-lg"></i></button></div><div class="mb-4"><p class="text-white/60 text-sm mb-4 leading-relaxed">Pilih file CSV yang sudah diisi sesuai template.<br>Format Header: <b>Name, Email, Password, Role</b> (Gunakan pemisah koma atau titik koma).</p><input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-white/70 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-300 hover:file:bg-blue-500/30 transition-all cursor-pointer"></div><button type="button" onclick="processCsvImport()" class="w-full mt-6 glass glass-hover py-4 rounded-xl font-bold bg-blue-600/20 text-blue-300 border border-blue-500/50 flex justify-center items-center transition-all shadow-lg shadow-blue-500/20"><i class="bi bi-upload mr-2"></i> Mulai Import Data</button>`; showModal();
         }
 
         function processCsvImport() {
-            const fileInput = document.getElementById('csvFileInput');
-            if (!fileInput.files || fileInput.files.length === 0) { Swal.fire('Oops', 'Silakan pilih file CSV terlebih dahulu.', 'warning'); return; }
-
+            const fileInput = document.getElementById('csvFileInput'); if (!fileInput.files || fileInput.files.length === 0) { Swal.fire('Oops', 'Silakan pilih file CSV terlebih dahulu.', 'warning'); return; }
             const file = fileInput.files[0]; const reader = new FileReader();
             reader.onload = function(e) {
-                const text = e.target.result; const rows = text.split('\n');
-                if(rows.length < 2) { Swal.fire('Format Salah', 'File CSV kosong atau tidak memiliki data baris.', 'error'); return; }
-
-                const delimiter = rows[0].indexOf(';') >= 0 ? ';' : ',';
-                const header = rows[0].split(delimiter).map(h => h.trim().toLowerCase());
+                const text = e.target.result; const rows = text.split('\n'); if(rows.length < 2) { Swal.fire('Format Salah', 'File CSV kosong.', 'error'); return; }
+                const delimiter = rows[0].indexOf(';') >= 0 ? ';' : ','; const header = rows[0].split(delimiter).map(h => h.trim().toLowerCase());
                 if (header[0] && header[0].charCodeAt(0) === 0xFEFF) { header[0] = header[0].substring(1); }
-
-                if(header[0] !== 'name' || header[1] !== 'email' || header[2] !== 'password' || header[3] !== 'role') {
-                    Swal.fire('Format Header Salah', 'Header CSV harus: Name, Email, Password, Role', 'error'); return;
-                }
-
+                if(header[0] !== 'name' || header[1] !== 'email' || header[2] !== 'password' || header[3] !== 'role') { Swal.fire('Format Header Salah', 'Header harus: Name, Email, Password, Role', 'error'); return; }
                 const newUsers = [];
-                for(let i = 1; i < rows.length; i++) {
-                    const cols = rows[i].split(delimiter).map(c => c.trim());
-                    if(cols.length >= 4 && cols[0] && cols[1] && cols[2]) {
-                        newUsers.push({ Name: cols[0], Email: cols[1], Password: cols[2], Role: cols[3].toLowerCase() === 'admin' ? 'admin' : 'student' });
-                    }
-                }
-
-                if(newUsers.length === 0) { Swal.fire('Data Kosong', 'Tidak ada baris data valid yang ditemukan untuk diimport.', 'warning'); return; }
-                
-                saveMultipleUsersToSupabase(newUsers);
-            };
-            reader.readAsText(file);
+                for(let i = 1; i < rows.length; i++) { const cols = rows[i].split(delimiter).map(c => c.trim()); if(cols.length >= 4 && cols[0] && cols[1] && cols[2]) { newUsers.push({ Name: cols[0], Email: cols[1], Password: cols[2], Role: cols[3].toLowerCase() === 'admin' ? 'admin' : 'student' }); } }
+                if(newUsers.length === 0) { Swal.fire('Data Kosong', 'Tidak ada data valid.', 'warning'); return; } saveMultipleUsersToSupabase(newUsers);
+            }; reader.readAsText(file);
         }
     </script>
 </body>
